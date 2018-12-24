@@ -4,7 +4,7 @@ import { Form, Item, Input, Text } from "native-base";
 import { Button } from "../components/Button";
 import { containersStyles, inputStyles, fontStyles } from "../styles";
 
-class Login extends Component {
+export class Login extends Component {
   state = {
     username: "",
     password: ""
@@ -44,9 +44,7 @@ class Login extends Component {
             rounded
             block
             key="public"
-            onPress={() => {
-              console.log("pressed");
-            }}
+            onPress={() => this.props.navigation.navigate("Opciones")}
           >
             Iniciar sesion
           </Button>
@@ -55,5 +53,3 @@ class Login extends Component {
     );
   }
 }
-
-export default Login;

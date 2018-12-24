@@ -1,6 +1,14 @@
 import React from "react";
 import { createStackNavigator } from "react-navigation";
-import Login from "./src/screens/Login";
+import {
+  Login,
+  Opciones,
+  CrearPlan,
+  InfoClientes,
+  ListarPlanes,
+  ListarVisitas
+} from "./src/screens";
+import { List } from "native-base";
 
 const MainNavigator = createStackNavigator({
   Login: {
@@ -8,6 +16,21 @@ const MainNavigator = createStackNavigator({
     navigationOptions: {
       header: null
     }
+  },
+  Opciones: {
+    screen: Opciones
+  },
+  CrearPlan: {
+    screen: CrearPlan
+  },
+  InfoClientes: {
+    screen: InfoClientes
+  },
+  ListarPlanes: {
+    screen: ListarPlanes
+  },
+  ListarVisitas: {
+    screen: ListarVisitas
   }
 });
 
