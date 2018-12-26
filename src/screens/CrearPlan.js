@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { _storeData } from "../utils/localStorageAPI";
+import { guardarDatos } from "../utils/localStorageAPI";
 import { SHA256 } from "crypto-js";
 import {
   Text,

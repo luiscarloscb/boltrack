@@ -1,9 +1,17 @@
 import { AsyncStorage } from "react-native";
 
-export const _storeData = async (key, value) => {
+export const guardarDatos = async (key, value) => {
   try {
-    await AsyncStorage.setItem(key, JSON.stringify(value));
+    return await AsyncStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
     console.log("Error salvando la informacion: " + error);
+  }
+};
+
+export const obtenerDatos = async key => {
+  try {
+    return await AsyncStorage.getItem(key);
+  } catch (error) {
+    console.log("Error obteniendo la informacion: " + error);
   }
 };
