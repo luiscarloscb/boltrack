@@ -25,7 +25,9 @@ export class Opciones extends Component {
         <Button
           full
           success
-          onPress={() => this.props.navigation.navigate("ListarPlanes")}
+          onPress={() =>
+            this.props.navigation.navigate("ListarPlanes", { ...this.PARAMS })
+          }
         >
           Planes de Visita
         </Button>

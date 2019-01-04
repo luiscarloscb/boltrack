@@ -19,10 +19,10 @@ export class CrearPlan extends Component {
   state = {
     FECHATAREA: new Date(),
     FECHAPLANIFICADA: new Date(),
-    TIPOTAREA: -1,
-    CLIENTE: -1,
-    SUCURSAL: -1,
-    TEMAVISITA: -1,
+    IDTIPOTAREA: -1,
+    IDCLIENTE: -1,
+    IDSUCURSAL: -1,
+    IDTEMAVISITA: -1,
     insumo: -1,
     cantidad: "0",
     DESARROLLOTAREA: "",
@@ -33,14 +33,14 @@ export class CrearPlan extends Component {
 
   setFechaTarea = FECHATAREA => this.setState({ FECHATAREA });
   setFechaPlanificada = FECHAPLANIFICADA => this.setState({ FECHAPLANIFICADA });
-  setTipoTarea = TIPOTAREA => this.setState({ TIPOTAREA });
-  setCliente = CLIENTE => {
+  setTipoTarea = IDTIPOTAREA => this.setState({ IDTIPOTAREA });
+  setCliente = IDCLIENTE => {
     this.setState(state => {
-      return { CLIENTE, sucursales: this.encontrarSucursal(CLIENTE) };
+      return { IDCLIENTE, sucursales: this.encontrarSucursal(IDCLIENTE) };
     });
   };
-  setSucursal = SUCURSAL => this.setState({ SUCURSAL });
-  setTemaVisita = TEMAVISITA => this.setState({ TEMAVISITA });
+  setSucursal = IDSUCURSAL => this.setState({ IDSUCURSAL });
+  setTemaVisita = IDTEMAVISITA => this.setState({ IDTEMAVISITA });
   setCantidad = cantidad => this.setState({ cantidad });
   setInsumo = insumo => this.setState({ insumo });
   setDesarrolloTarea = DESARROLLOTAREA => this.setState({ DESARROLLOTAREA });
@@ -65,10 +65,10 @@ export class CrearPlan extends Component {
     this.setState({
       FECHATAREA: new Date(),
       FECHAPLANIFICADA: new Date(),
-      TIPOTAREA: -1,
-      CLIENTE: -1,
-      SUCURSAL: -1,
-      TEMAVISITA: -1,
+      IDTIPOTAREA: -1,
+      IDCLIENTE: -1,
+      IDSUCURSAL: -1,
+      IDTEMAVISITA: -1,
       insumo: -1,
       cantidad: "0",
       DESARROLLOTAREA: "",
@@ -79,9 +79,9 @@ export class CrearPlan extends Component {
   guardarPlan = async () => {
     // Valida campos requeridos, guarda si todo esta ok
     const { insumo, cantidad, sucursales, ...rest } = this.state;
-    rest.CLIENTE == -1
+    rest.IDCLIENTE == -1
       ? alert("Seleccione un cliente")
-      : rest.SUCURSAL == -1
+      : rest.IDSUCURSAL == -1
       ? alert("Seleccione una sucursal")
       : await guardarPlanLocal({ ...rest }, this.resetState);
   };
@@ -111,7 +111,7 @@ export class CrearPlan extends Component {
   encontrarContacto = SUCURSALES => {
     // Encuentra el contacto para la sucursal seleccionada
     const sucursal = SUCURSALES.find(
-      sucur => sucur.sucursalId == this.state.SUCURSAL
+      sucur => sucur.sucursalId == this.state.IDSUCURSAL
     );
     return sucursal
       ? sucursal.sucursalContacto
@@ -167,7 +167,7 @@ export class CrearPlan extends Component {
                 note
                 mode="dropdown"
                 style={{ width: 250 }}
-                selectedValue={this.state.TIPOTAREA}
+                selectedValue={this.state.IDTIPOTAREA}
                 onValueChange={this.setTipoTarea}
                 placeholder={"Tipo Tarea"}
               >
@@ -179,7 +179,7 @@ export class CrearPlan extends Component {
                 note
                 mode="dropdown"
                 style={{ width: 250 }}
-                selectedValue={this.state.CLIENTE}
+                selectedValue={this.state.IDCLIENTE}
                 onValueChange={this.setCliente}
                 placeholder={"Cliente"}
               >
@@ -191,7 +191,7 @@ export class CrearPlan extends Component {
                 note
                 mode="dropdown"
                 style={{ width: 250 }}
-                selectedValue={this.state.SUCURSAL}
+                selectedValue={this.state.IDSUCURSAL}
                 onValueChange={this.setSucursal}
                 placeholder={"Sucursal"}
               >
@@ -213,7 +213,7 @@ export class CrearPlan extends Component {
                 note
                 mode="dropdown"
                 style={{ width: 250 }}
-                selectedValue={this.state.TEMAVISITA}
+                selectedValue={this.state.IDTEMAVISITA}
                 onValueChange={this.setTemaVisita}
                 placeholder={"Tema Visita"}
               >
