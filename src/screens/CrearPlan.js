@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { guardarDatos } from "../utils/localStorageAPI";
-import { SHA256 } from "crypto-js";
+import { guardarPlanLocal } from "../utils/localStorageAPI";
 import {
   Text,
   Container,
@@ -18,48 +17,114 @@ import {
 import { Button } from "../components/Button";
 export class CrearPlan extends Component {
   state = {
-    fechaTarea: new Date(),
-    fechaPlanificada: new Date(),
-    tipoTarea: "",
-    cliente: "",
-    sucursal: "",
-    temaVisita: "",
-    insumo: "",
-    cantidad: "",
-    desarrolloTarea: "",
-    objetivo: "",
-    insumos: []
+    FECHATAREA: new Date(),
+    FECHAPLANIFICADA: new Date(),
+    TIPOTAREA: -1,
+    CLIENTE: -1,
+    SUCURSAL: -1,
+    TEMAVISITA: -1,
+    insumo: -1,
+    cantidad: "0",
+    DESARROLLOTAREA: "",
+    OBJETIVO: "",
+    INSUMOS: [],
+    sucursales: []
   };
-  setFechaTarea = fechaTarea => this.setState({ fechaTarea });
-  setFechaPlanificada = fechaPlanificada => this.setState({ fechaPlanificada });
-  setTipoTarea = tipoTarea => this.setState({ tipoTarea });
-  setCliente = cliente => this.setState({ cliente });
-  setSucursal = sucursal => this.setState({ sucursal });
-  setTemaVisita = temaVisita => this.setState({ temaVisita });
+
+  setFechaTarea = FECHATAREA => this.setState({ FECHATAREA });
+  setFechaPlanificada = FECHAPLANIFICADA => this.setState({ FECHAPLANIFICADA });
+  setTipoTarea = TIPOTAREA => this.setState({ TIPOTAREA });
+  setCliente = CLIENTE => {
+    this.setState(state => {
+      return { CLIENTE, sucursales: this.encontrarSucursal(CLIENTE) };
+    });
+  };
+  setSucursal = SUCURSAL => this.setState({ SUCURSAL });
+  setTemaVisita = TEMAVISITA => this.setState({ TEMAVISITA });
   setCantidad = cantidad => this.setState({ cantidad });
   setInsumo = insumo => this.setState({ insumo });
-  setDesarrolloTarea = desarrolloTarea => this.setState({ desarrolloTarea });
-  setObjetivo = objetivo => this.setState({ objetivo });
+  setDesarrolloTarea = DESARROLLOTAREA => this.setState({ DESARROLLOTAREA });
+  setObjetivo = OBJETIVO => this.setState({ OBJETIVO });
 
   addInsumo = () => {
-    let nuevoInsumo = { insumo: this.state.insumo, monto: this.state.monto };
+    //Agrega el insumo y la cantidad seleccionada en la lista INSUMOS
+    let nuevoInsumo = {
+      insumo: this.state.insumo,
+      cantidad: parseInt(this.state.cantidad)
+    };
     this.setState(state => {
       return {
-        insumos: state.insumos.concat(nuevoInsumo),
+        INSUMOS: state.INSUMOS.concat(nuevoInsumo),
         insumo: "",
-        monto: ""
+        cantidad: ""
       };
     });
   };
-
-  guardarPlan = () => {
-    const { insumo, monto, ...rest } = this.state;
-    const block = Object.assign({}, rest);
-    const blockHash = SHA256(JSON.stringify(block));
-    console.log("block: " + JSON.stringify(block));
-    console.log("blockHash: " + blockHash);
+  resetState = () =>
+    //Vuelve el state a su estado original
+    this.setState({
+      FECHATAREA: new Date(),
+      FECHAPLANIFICADA: new Date(),
+      TIPOTAREA: -1,
+      CLIENTE: -1,
+      SUCURSAL: -1,
+      TEMAVISITA: -1,
+      insumo: -1,
+      cantidad: "0",
+      DESARROLLOTAREA: "",
+      OBJETIVO: "",
+      INSUMOS: [],
+      sucursales: []
+    });
+  guardarPlan = async () => {
+    // Valida campos requeridos, guarda si todo esta ok
+    const { insumo, cantidad, sucursales, ...rest } = this.state;
+    rest.CLIENTE == -1
+      ? alert("Seleccione un cliente")
+      : rest.SUCURSAL == -1
+      ? alert("Seleccione una sucursal")
+      : await guardarPlanLocal({ ...rest }, this.resetState);
   };
+
+  renderPickerItem = (arr, keys) => {
+    // Renderiza las opciones disponibles de un array de objectos [{ID, NOMBRE}]
+    return arr.length > 0 ? (
+      arr.map(item => (
+        <Picker.Item
+          key={item[keys[1]]}
+          label={item[keys[1]]}
+          value={item[keys[0]]}
+        />
+      ))
+    ) : (
+      <Picker.Item label="NO TIENE ASSIGNADO NINGUN ITEM" value={null} />
+    );
+  };
+
+  encontrarSucursal = clienteSel => {
+    // Encuentra las sucursales disponibles por cliente seleccionado
+    const { CLIENTES } = this.props.navigation.state.params.DATA;
+    const cliente = CLIENTES.find(cliente => cliente.clienteID == clienteSel);
+    return cliente ? cliente.sucursales : [];
+  };
+
+  encontrarContacto = SUCURSALES => {
+    // Encuentra el contacto para la sucursal seleccionada
+    const sucursal = SUCURSALES.find(
+      sucur => sucur.sucursalId == this.state.SUCURSAL
+    );
+    return sucursal
+      ? sucursal.sucursalContacto
+      : "Seleccione primero una sucursal";
+  };
+
   render() {
+    const {
+      TIPOTAREAS,
+      CLIENTES,
+      TEMAVISITAS,
+      INSUMOS
+    } = this.props.navigation.state.params.DATA;
     return (
       <Container>
         <Content>
@@ -77,7 +142,7 @@ export class CrearPlan extends Component {
                 onDateChange={this.setFechaTarea}
               />
               <Text>
-                Fecha Tarea: {this.state.fechaTarea.toString().substr(4, 12)}
+                Fecha Tarea: {this.state.FECHATAREA.toString().substr(4, 12)}
               </Text>
             </Item>
             <Item>
@@ -94,90 +159,77 @@ export class CrearPlan extends Component {
               />
               <Text>
                 Fecha Planificada:
-                {this.state.fechaPlanificada.toString().substr(4, 12)}
+                {this.state.FECHAPLANIFICADA.toString().substr(4, 12)}
               </Text>
             </Item>
             <Item>
               <Picker
                 note
                 mode="dropdown"
-                style={{ width: 120 }}
-                selectedValue={this.state.tipoTarea}
+                style={{ width: 250 }}
+                selectedValue={this.state.TIPOTAREA}
                 onValueChange={this.setTipoTarea}
                 placeholder={"Tipo Tarea"}
               >
-                <Picker.Item label="Wallet" value="key0" />
-                <Picker.Item label="ATM Card" value="key1" />
-                <Picker.Item label="Debit Card" value="key2" />
-                <Picker.Item label="Credit Card" value="key3" />
-                <Picker.Item label="Net Banking" value="key4" />
+                {this.renderPickerItem(TIPOTAREAS, ["tareaID", "tareaNombre"])}
               </Picker>
             </Item>
             <Item>
               <Picker
                 note
                 mode="dropdown"
-                style={{ width: 120 }}
-                selectedValue={this.state.cliente}
+                style={{ width: 250 }}
+                selectedValue={this.state.CLIENTE}
                 onValueChange={this.setCliente}
                 placeholder={"Cliente"}
               >
-                <Picker.Item label="Wallet" value="key0" />
-                <Picker.Item label="ATM Card" value="key1" />
-                <Picker.Item label="Debit Card" value="key2" />
-                <Picker.Item label="Credit Card" value="key3" />
-                <Picker.Item label="Net Banking" value="key4" />
+                {this.renderPickerItem(CLIENTES, ["clienteID", "clienteNom"])}
               </Picker>
             </Item>
             <Item>
               <Picker
                 note
                 mode="dropdown"
-                style={{ width: 120 }}
-                selectedValue={this.state.sucursal}
+                style={{ width: 250 }}
+                selectedValue={this.state.SUCURSAL}
                 onValueChange={this.setSucursal}
                 placeholder={"Sucursal"}
               >
-                <Picker.Item label="Wallet" value="key0" />
-                <Picker.Item label="ATM Card" value="key1" />
-                <Picker.Item label="Debit Card" value="key2" />
-                <Picker.Item label="Credit Card" value="key3" />
-                <Picker.Item label="Net Banking" value="key4" />
+                {this.renderPickerItem(this.state.sucursales, [
+                  "sucursalId",
+                  "sucursalNom"
+                ])}
               </Picker>
             </Item>
             <Item disabled>
-              <Input disabled placeholder="Contacto" />
+              <Input
+                disableds
+                placeholder="Contacto"
+                value={this.encontrarContacto(this.state.sucursales)}
+              />
             </Item>
             <Item>
               <Picker
                 note
                 mode="dropdown"
-                style={{ width: 120 }}
-                selectedValue={this.state.temaVisita}
+                style={{ width: 250 }}
+                selectedValue={this.state.TEMAVISITA}
                 onValueChange={this.setTemaVisita}
                 placeholder={"Tema Visita"}
               >
-                <Picker.Item label="Wallet" value="key0" />
-                <Picker.Item label="ATM Card" value="key1" />
-                <Picker.Item label="Debit Card" value="key2" />
-                <Picker.Item label="Credit Card" value="key3" />
-                <Picker.Item label="Net Banking" value="key4" />
+                {this.renderPickerItem(TEMAVISITAS, ["temaID", "temaNombre"])}
               </Picker>
             </Item>
             <Item>
               <Picker
                 note
                 mode="dropdown"
-                style={{ width: 120 }}
+                style={{ width: 250 }}
                 selectedValue={this.state.insumo}
                 onValueChange={this.setInsumo}
                 placeholder={"Insumos"}
               >
-                <Picker.Item label="Wallet" value="key0" />
-                <Picker.Item label="ATM Card" value="key1" />
-                <Picker.Item label="Debit Card" value="key2" />
-                <Picker.Item label="Credit Card" value="key3" />
-                <Picker.Item label="Net Banking" value="key4" />
+                {this.renderPickerItem(INSUMOS, ["insumoID", "insumoNombre"])}
               </Picker>
 
               <Input
@@ -197,11 +249,16 @@ export class CrearPlan extends Component {
             </Item>
             <Item>
               <List
-                dataArray={this.state.insumos}
+                dataArray={this.state.INSUMOS}
                 renderRow={item => (
                   <ListItem>
                     <Text>
-                      {"NOMBRE: " + item.insumo + "CANTIDAD: " + item.cantidad}
+                      {"NOMBRE: " +
+                        INSUMOS.find(insumo => insumo.insumoID == item.insumo)
+                          .insumoNombre +
+                        "    " +
+                        "CANTIDAD: " +
+                        item.cantidad.toString()}
                     </Text>
                   </ListItem>
                 )}
@@ -212,8 +269,9 @@ export class CrearPlan extends Component {
                 <Label>Desarrollo de la Tarea</Label>
                 <Input
                   multiline
-                  value={this.state.desarrolloTarea}
-                  onChangeText={this.setdesarrolloTarea}
+                  value={this.state.DESARROLLOTAREA}
+                  onChangeText={this.setDesarrolloTarea}
+                  width={250}
                 />
               </Item>
             </Item>
@@ -221,8 +279,9 @@ export class CrearPlan extends Component {
               <Label>Objetivo</Label>
               <Input
                 multiline
-                value={this.state.objetivo}
+                value={this.state.OBJETIVO}
                 onChangeText={this.setObjetivo}
+                width={250}
               />
             </Item>
             <Item>
