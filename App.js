@@ -8,6 +8,9 @@ import { eliminarDatos } from "./src/utils/localStorageAPI";
 const AppContainer = createAppContainer(MainNavigator);
 
 export default class App extends Component {
+  //async componentDidMount() {
+  //  eliminarDatos(["TOKEN", "DATA", "CONFIG", "PLANES"]);
+  //}
   render() {
     return (
       <View style={{ flex: 1 }}>
