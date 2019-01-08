@@ -1,4 +1,5 @@
 import { AsyncStorage } from "react-native";
+import { uuidv4 } from "../utils/helpers";
 
 export const guardarDato = async (key, value) => {
   try {
@@ -29,6 +30,8 @@ export const eliminarDatos = async keys => {
 export const guardarPlanLocal = async (plan, cb) => {
   try {
     const PLANES = await obtenerDato("PLANES");
+    plan.IDVISITA = uuidv4();
+    plan.ESTADO = "PENDIENTE";
     if (Array.isArray(PLANES)) {
       await guardarDato("PLANES", [...PLANES, plan]);
       cb();
@@ -40,5 +43,14 @@ export const guardarPlanLocal = async (plan, cb) => {
     }
   } catch (e) {
     alert("400 error");
+  }
+};
+
+export const obtenerPlanesLocal = async (plan, cb) => {
+  try {
+    const PLANES = await obtenerDato("PLANES");
+    return Array.isArray(PLANES) ? PLANES : [];
+  } catch (e) {
+    alert("Error obteniendo la lista de planes");
   }
 };

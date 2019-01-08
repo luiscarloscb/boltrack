@@ -6,8 +6,10 @@ import {
   CrearPlan,
   InfoClientes,
   ListarPlanes,
-  ListarVisitas
+  ListarVisitas,
+  CrearVisita
 } from "./src/screens";
+import { Camara } from "./src/components/Camera";
 import { List } from "native-base";
 
 const MainNavigator = createStackNavigator({
@@ -18,10 +20,16 @@ const MainNavigator = createStackNavigator({
     }
   },
   Opciones: {
-    screen: Opciones
+    screen: Opciones,
+    navigationOptions: {
+      headerLeft: null
+    }
   },
   CrearPlan: {
     screen: CrearPlan
+  },
+  CrearVisita: {
+    screen: CrearVisita
   },
   InfoClientes: {
     screen: InfoClientes

@@ -6,6 +6,7 @@ import { Lista } from "../components/Lista";
 export const ListarPlanes = props => {
   //console.log(props.navigation.state.params.DATA);
   const { DATA } = props.navigation.state.params;
+  console.log(DATA);
   return (
     <Lista
       data={DATA}

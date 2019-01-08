@@ -5,8 +5,8 @@ import { Lista } from "../components/Lista";
 
 export const ListarVisitas = props => {
   const { DATA } = props.navigation.state.params;
-  DATA.VISITASPLANEADAS = DATA.VISITASPLANEADAS.filter(
-    visita => visita.ESTADO === "COMPLETADA"
+  DATA.VISITASPLANEADAS = DATA.VISITASPLANEADAS.filter(visita =>
+    console.log(visita)
   );
   return (
     <Lista

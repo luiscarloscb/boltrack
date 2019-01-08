@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { guardarPlanLocal } from "../utils/localStorageAPI";
+
 import {
   Text,
   Container,
@@ -48,17 +49,22 @@ export class CrearPlan extends Component {
 
   addInsumo = () => {
     //Agrega el insumo y la cantidad seleccionada en la lista INSUMOS
-    let nuevoInsumo = {
-      insumo: this.state.insumo,
-      cantidad: parseInt(this.state.cantidad)
-    };
-    this.setState(state => {
-      return {
-        INSUMOS: state.INSUMOS.concat(nuevoInsumo),
-        insumo: "",
-        cantidad: ""
+    const { insumo, cantidad } = this.state;
+    if (insumo !== "" || parseInt(cantidad) > 0) {
+      let nuevoInsumo = {
+        insumo: insumo,
+        cantidad: parseInt(cantidad)
       };
-    });
+      this.setState(state => {
+        return {
+          INSUMOS: state.INSUMOS.concat(nuevoInsumo),
+          insumo: "",
+          cantidad: ""
+        };
+      });
+    } else {
+      alert("Porfavor llene los campos correctamente");
+    }
   };
   resetState = () =>
     //Vuelve el state a su estado original
@@ -123,8 +129,10 @@ export class CrearPlan extends Component {
       TIPOTAREAS,
       CLIENTES,
       TEMAVISITAS,
-      INSUMOS
+      INSUMOS,
+      ...rest
     } = this.props.navigation.state.params.DATA;
+    console.log(rest);
     return (
       <Container>
         <Content>
@@ -158,7 +166,7 @@ export class CrearPlan extends Component {
                 onDateChange={this.setFechaPlanificada}
               />
               <Text>
-                Fecha Planificada:
+                Fecha Planificada:{" "}
                 {this.state.FECHAPLANIFICADA.toString().substr(4, 12)}
               </Text>
             </Item>
@@ -203,7 +211,7 @@ export class CrearPlan extends Component {
             </Item>
             <Item disabled>
               <Input
-                disableds
+                disabled
                 placeholder="Contacto"
                 value={this.encontrarContacto(this.state.sucursales)}
               />
