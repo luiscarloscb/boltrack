@@ -9,5 +9,5 @@ export const blackTrans = "rgba(0, 0, 0, 0.5)";
 export const transparent = "rgba(255, 255, 255, 0)";
 export const headerColor = "#2c3e50";
 export const aquaGreen = "#28AFB0";
-export const cakeGreen = "#D9F4C7";
+export const cakeGreen = "#EFFFE8";
 export const pale = "#F8FCFF";

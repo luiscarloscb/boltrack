@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View, TouchableOpacity } from "react-native";
-import { Icon } from "native-base";
+import { Icon, Spinner } from "native-base";
 import { Camera, Permissions } from "expo";
 
 export class Camara extends React.Component {
@@ -13,19 +13,27 @@ export class Camara extends React.Component {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === "granted" });
   }
-
+  componentWillUnmount() {
+    this.setState({
+      hasCameraPermission: null,
+      type: Camera.Constants.Type.back
+    });
+  }
   render() {
-    const { hasCameraPermission } = this.state;
+    const { hasCameraPermission, type } = this.state;
+    const { isLoading, snap } = this.props;
     if (hasCameraPermission === null) {
       return <View />;
     } else if (hasCameraPermission === false) {
-      return <Text>No access to camera</Text>;
+      return (
+        <Text>No tiene acceso a la camera porfavor revise sus permisos.</Text>
+      );
     } else {
       return (
         <View style={{ flex: 1 }}>
           <Camera
             style={{ flex: 1 }}
-            type={this.state.type}
+            type={type}
             ref={ref => {
               this.camera = ref;
             }}
@@ -43,12 +51,16 @@ export class Camara extends React.Component {
                   alignSelf: "flex-end",
                   alignItems: "center"
                 }}
-                onPress={() => this.props.snap(this.camera)}
+                onPress={() => snap(this.camera)}
               >
-                <Icon
-                  name="ios-camera"
-                  style={{ fontSize: 100, color: "white" }}
-                />
+                {isLoading ? (
+                  <Spinner />
+                ) : (
+                  <Icon
+                    name="ios-camera"
+                    style={{ fontSize: 100, color: "white" }}
+                  />
+                )}
               </TouchableOpacity>
             </View>
           </Camera>

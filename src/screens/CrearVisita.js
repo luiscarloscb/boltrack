@@ -22,21 +22,25 @@ export class CrearVisita extends Component {
     LOGROSVISITA: "",
     FECHAPROXIMAVISITA: "",
     COORDENADASGPS: [],
-    IMAGEN: null,
+    IMAGENES: [],
     errorMessage: "",
     status: "",
-    mostrarCamara: false
+    mostrarCamara: false,
+    camaraCargando: false
   };
 
   setFechaVisita = FECHAVISITA => this.setState({ FECHAVISITA });
   setFechaProximaVisita = FECHAPROXIMAVISITA =>
     this.setState({ FECHAPROXIMAVISITA });
   setLogroVisita = LOGROSVISITA => this.setState({ LOGROSVISITA });
-  setImagen = IMAGEN => this.setState({ IMAGEN });
+  setImagen = IMAGEN =>
+    this.setState(state => ({
+      IMAGENES: state.IMAGENES.concat(IMAGEN),
+      mostrarCamara: false,
+      camaraCargando: false
+    }));
 
   componentDidMount() {
-    const { imagen } = this.props.navigation.state.params;
-
     Permissions.getAsync(Permissions.LOCATION)
       .then(({ status }) => {
         if (status === "granted") {
@@ -50,9 +54,6 @@ export class CrearVisita extends Component {
 
         this.setState(() => ({ status: "undetermined" }));
       });
-    if (imagen) {
-      this.setState({ IMAGEN: imagen.uri });
-    }
   }
   obtenerCoordenadas = async () => {
     Location.watchPositionAsync(
@@ -70,21 +71,19 @@ export class CrearVisita extends Component {
       }
     );
   };
-  snap = async camera => {
-    if (camera) {
-      let imagen = await camera.takePictureAsync({
-        base64: true,
-        quality: 0.5
-      });
-      this.setState({
-        IMAGEN: imagen.uri,
-        mostrarCamara: false
-      });
-    }
+  snap = async (camera, cb) => {
+    this.setState({ camaraCargando: true }, async () => {
+      if (camera) {
+        let imagen = await camera.takePictureAsync({
+          base64: true,
+          quality: 0.5
+        });
+        this.setImagen(imagen.base64);
+      }
+    });
   };
   guardarVisita = () => {
     const { errorMessage, status, mostrarCamara, ...rest } = this.state;
-    console.log(rest);
   };
   render() {
     let coordenadas = "cargando..";
@@ -94,7 +93,7 @@ export class CrearVisita extends Component {
       coordenadas = JSON.stringify(this.state.COORDENADASGPS);
     }
     return this.state.mostrarCamara ? (
-      <Camara snap={this.snap} />
+      <Camara snap={this.snap} isLoading={this.state.camaraCargando} />
     ) : (
       <Container>
         <Content>
@@ -157,16 +156,20 @@ export class CrearVisita extends Component {
             >
               Tomar foto
             </Button>
-            <Thumbnail
-              style={{ alignSelf: "center" }}
-              large
-              square
-              source={{
-                uri: this.state.IMAGEN
-                  ? this.state.IMAGEN
-                  : "../../assets/imagen-placeholder.jpg"
-              }}
-            />
+            <Item style={{ justifyContent: "space-around" }}>
+              {this.state.IMAGENES.map(imagen => (
+                <Thumbnail
+                  key={imagen}
+                  large
+                  square
+                  source={{
+                    uri: imagen
+                      ? `data:image/jpg;base64,${imagen}`
+                      : "../../assets/imagen-placeholder.jpg"
+                  }}
+                />
+              ))}
+            </Item>
             <Button success full onPress={this.guardarVisita}>
               Guardar Visita
             </Button>

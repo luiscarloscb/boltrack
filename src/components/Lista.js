@@ -7,40 +7,54 @@ import {
   Text,
   Right,
   Body,
-  Icon
+  Icon,
+  Button,
+  Card,
+  CardItem
 } from "native-base";
 import { cakeGreen, pale } from "../utils/colors";
-import { Button } from "../components/Button";
 import { formatearVisitaPlaneada } from "../utils/helpers";
 import { obtenerPlanesLocal } from "../utils/localStorageAPI";
 
 export class Lista extends Component {
   state = { visitas: [] };
   async componentDidMount() {
+    // Fusionando visitas en localStorage con visitas en API.
     const { VISITASPLANEADAS } = this.props.data;
     const VISITASLOCALES = await obtenerPlanesLocal();
     this.setState({ visitas: [...VISITASPLANEADAS, ...VISITASLOCALES] });
   }
+
   render() {
     const { CLIENTES, TEMAVISITAS } = this.props.data;
+    const { visitasCompletadas, renderOptions } = this.props;
+    const { visitas } = this.state;
     return (
       <Container>
         <List
-          dataArray={this.state.visitas}
+          dataArray={
+            visitasCompletadas
+              ? visitas.filter(v => v.ESTADO === "COMPLETADA")
+              : visitas
+          }
           renderRow={visita => (
-            <ListItem
-              style={{
-                backgroundColor:
-                  visita.ESTADO == "COMPLETADA" ? cakeGreen : pale
-              }}
-            >
-              <Body>
-                <Text>
-                  {formatearVisitaPlaneada(visita, CLIENTES, TEMAVISITAS)}
-                </Text>
-              </Body>
-              <Right>{this.props.renderOptions(visita)}</Right>
-            </ListItem>
+            <Card>
+              <CardItem
+                style={{
+                  backgroundColor:
+                    visita.ESTADO == "COMPLETADA" ? cakeGreen : pale
+                }}
+              >
+                <Body>
+                  <Text style={{ color: "black" }}>
+                    {formatearVisitaPlaneada(visita, CLIENTES, TEMAVISITAS)}
+                  </Text>
+                </Body>
+              </CardItem>
+              <CardItem style={{ flexDirection: "row" }}>
+                {renderOptions(visita)}
+              </CardItem>
+            </Card>
           )}
         />
       </Container>

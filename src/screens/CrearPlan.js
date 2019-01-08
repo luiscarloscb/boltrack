@@ -132,7 +132,6 @@ export class CrearPlan extends Component {
       INSUMOS,
       ...rest
     } = this.props.navigation.state.params.DATA;
-    console.log(rest);
     return (
       <Container>
         <Content>
@@ -292,11 +291,9 @@ export class CrearPlan extends Component {
                 width={250}
               />
             </Item>
-            <Item>
-              <Button success full onPress={this.guardarPlan}>
-                Guardar Plan
-              </Button>
-            </Item>
+            <Button success full onPress={this.guardarPlan}>
+              Guardar Plan
+            </Button>
           </Form>
         </Content>
       </Container>

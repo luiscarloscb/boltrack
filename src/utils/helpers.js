@@ -42,6 +42,6 @@ export const formatearVisitaPlaneada = (VISITA, CLIENTES, TEMAVISITAS) => {
     SUCURSAL: ${sucursalNom} \n
     CONTACTO: ${sucursalContacto} \n
     FECHA PLANEADA: ${convertTime(VISITA.FECHAPLANIFICADA)} \n
-    TEMA VISITA: ${temaNombre}
+    TEMA VISITA: ${temaNombre} \n
     `;
 };

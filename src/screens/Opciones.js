@@ -38,7 +38,7 @@ export class Opciones extends Component {
             this.props.navigation.navigate("CrearVisita", { ...this.PARAMS })
           }
         >
-          Crear Visita
+          Crear Visita No Programada
         </Button>
         <Button
           full
