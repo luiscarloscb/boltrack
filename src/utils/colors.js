@@ -11,3 +11,4 @@ export const headerColor = "#2c3e50";
 export const aquaGreen = "#28AFB0";
 export const cakeGreen = "#EFFFE8";
 export const pale = "#F8FCFF";
+export const grayBackground = "#EEEEEE";

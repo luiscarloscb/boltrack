@@ -26,7 +26,13 @@ export const eliminarDatos = async keys => {
     console.log("Error Eliminando la informacion: " + error);
   }
 };
-
+export const eliminarDato = async key => {
+  try {
+    return await AsyncStorage.removeItem(key);
+  } catch (error) {
+    console.log("Error Eliminando la informacion: " + error);
+  }
+};
 export const guardarPlanLocal = async (plan, cb) => {
   try {
     const PLANES = await obtenerDato("PLANES");
@@ -52,5 +58,31 @@ export const obtenerPlanesLocal = async (plan, cb) => {
     return Array.isArray(PLANES) ? PLANES : [];
   } catch (e) {
     alert("Error obteniendo la lista de planes");
+  }
+};
+
+export const guardarVisitaRealizada = async (visita, cb) => {
+  try {
+    visita.ESTADO = "COMPLETADA";
+    const PLANES = await obtenerDato("PLANES");
+    await eliminarDato("PLANES");
+    const visitas = PLANES.filter(plan => plan.IDVISITA !== visita.IDVISITA);
+    await guardarDato("PLANES", visitas.concat(visita));
+    alert("200 OK");
+    cb();
+  } catch (e) {
+    alert("400 error");
+  }
+};
+
+export const eliminarVisita = async IDVISITA => {
+  try {
+    const PLANES = await obtenerDato("PLANES");
+    await eliminarDato("PLANES");
+    const visitas = PLANES.filter(plan => plan.IDVISITA !== IDVISITA);
+    await guardarDato("PLANES", visitas);
+    alert("La visita se elimino correctamente");
+  } catch (e) {
+    alert("400 error");
   }
 };

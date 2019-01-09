@@ -5,3 +5,4 @@ export * from "./Login";
 export * from "./InfoClientes";
 export * from "./Opciones";
 export * from "./CrearVisita";
+export * from "./RegistrarCliente";

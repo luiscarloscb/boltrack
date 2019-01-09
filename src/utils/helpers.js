@@ -45,3 +45,35 @@ export const formatearVisitaPlaneada = (VISITA, CLIENTES, TEMAVISITAS) => {
     TEMA VISITA: ${temaNombre} \n
     `;
 };
+
+export const formatearVisitaDetallada = (
+  VISITA,
+  CLIENTES,
+  TEMAVISITAS,
+  INSUMOS
+) => {
+  const { clienteNom, sucursales } = CLIENTES.find(
+    item => item.clienteID == VISITA.IDCLIENTE
+  );
+  const { sucursalNom, sucursalContacto } = sucursales.find(
+    item => item.sucursalId == VISITA.IDSUCURSAL
+  );
+  const { temaNombre } = TEMAVISITAS.find(
+    item => item.temaID == VISITA.IDTEMAVISITA
+  );
+  return `
+    NOMBRE CLIENTE: ${clienteNom} \n
+    SUCURSAL: ${sucursalNom} \n
+    CONTACTO: ${sucursalContacto} \n
+    FECHA PLANEADA: ${convertTime(VISITA.FECHAPLANIFICADA)} \n
+    TEMA VISITA: ${temaNombre} \n
+    INSUMOS: ${VISITA.INSUMOS.map(
+      insumoVisita =>
+        `\n -${
+          INSUMOS.find(
+            insumoData => insumoData.insumoID == insumoVisita.insumoID
+          ).insumoNombre
+        } ----> ${insumoVisita.cantidad}`
+    )}
+    `;
+};

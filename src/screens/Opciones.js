@@ -35,19 +35,21 @@ export class Opciones extends Component {
           full
           success
           onPress={() =>
-            this.props.navigation.navigate("CrearVisita", { ...this.PARAMS })
+            this.props.navigation.navigate("ListarVisitas", { ...this.PARAMS })
           }
         >
-          Crear Visita No Programada
+          Visitas Realizadas
         </Button>
         <Button
           full
           success
           onPress={() =>
-            this.props.navigation.navigate("ListarVisitas", { ...this.PARAMS })
+            this.props.navigation.navigate("RegistrarCliente", {
+              ...this.PARAMS
+            })
           }
         >
-          Visitas Realizadas
+          Registrar Cliente
         </Button>
         <Button
           full
