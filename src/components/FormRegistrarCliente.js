@@ -1,8 +1,5 @@
 import React, { Component } from "react";
-import { Location, Permissions } from "expo";
-import { Container, Content } from "native-base";
-import { Button } from "./Button";
-import { Camara } from "./Camera";
+import { Form } from "native-base";
 
 export class FormRegistrarCliente extends Component {
   state = {
@@ -13,7 +10,10 @@ export class FormRegistrarCliente extends Component {
     ACTICVIDADSECUNDARIAOPT: "",
     TIPOPERSONA: "",
     NIT: "",
-    REPRESENTANTELEGAL: ""
+    REPRESENTANTELEGAL: "",
+    isChecked: false,
+    LIMITECREDITO: "",
+    CODIGO: ""
   };
 
   setRazonSocial = RAZONSOCIAL => this.setState({ RAZONSOCIAL });
@@ -28,7 +28,10 @@ export class FormRegistrarCliente extends Component {
   setNIT = NIT => this.setState({ NIT });
   setRepresentanteLegal = REPRESENTANTELEGAL =>
     this.setState({ REPRESENTANTELEGAL });
-
+  toggleIsChecked = () =>
+    this.setState(state => ({ isChecked: !state.isChecked }));
+  setLimiteCredito = LIMITECREDITO => this.setState({ LIMITECREDITO });
+  setCodigo = CODIGO => this.setState({ CODIGO });
   componentWillUnmount() {
     this.resetState();
   }
@@ -42,7 +45,10 @@ export class FormRegistrarCliente extends Component {
       ACTICVIDADSECUNDARIAOPT: "",
       TIPOPERSONA: "",
       NIT: "",
-      REPRESENTANTELEGAL: ""
+      REPRESENTANTELEGAL: "",
+      isChecked: false,
+      LIMITECREDITO: "",
+      CODIGO: ""
     });
   getSetters = () => ({
     setRazonSocial: this.setRazonSocial,
@@ -52,15 +58,16 @@ export class FormRegistrarCliente extends Component {
     setActividadSecundariaOpt: this.setActividadSecundariaOpt,
     setTipoPersona: this.setTipoPersona,
     setNIT: this.setNIT,
-    setRepresentanteLegal: this.setRepresentanteLegal
+    setRepresentanteLegal: this.setRepresentanteLegal,
+    toggleIsChecked: this.toggleIsChecked,
+    setLimiteCredito: this.setLimiteCredito,
+    setCodigo: this.setCodigo
   });
   render() {
     return (
-      <Container style={{ backgroundColor: "#EEEEEE" }}>
-        <Content style={{ paddingHorizontal: 10 }}>
-          {this.props.children(this.state, this.getSetters(), this.resetState)}
-        </Content>
-      </Container>
+      <Form>
+        {this.props.children(this.state, this.getSetters(), this.resetState)}
+      </Form>
     );
   }
 }

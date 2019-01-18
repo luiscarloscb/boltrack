@@ -1,5 +1,14 @@
 import React, { Fragment } from "react";
-import { Picker, Input, Button, Icon, Header, Body } from "native-base";
+import {
+  Picker,
+  Input,
+  Button,
+  Icon,
+  Header,
+  Body,
+  Left,
+  Right
+} from "native-base";
 import { SearchBar } from "./SearchBar";
 export const InsumosPicker = ({ state, setters, renderPickerItem }) => (
   <Fragment>
@@ -14,9 +23,15 @@ export const InsumosPicker = ({ state, setters, renderPickerItem }) => (
       }}
       renderHeader={backAction => (
         <Header>
-          <Body style={{ flex: 1 }}>
+          <Left>
+            <Button transparent onPress={backAction}>
+              <Icon name="ios-arrow-back" style={{ color: "black" }} />
+            </Button>
+          </Left>
+          <Body style={{ flex: 3 }}>
             <SearchBar value={state.query} onChangeText={setters.setQuery} />
           </Body>
+          <Right />
         </Header>
       )}
       placeholder={"Insumos"}
@@ -33,7 +48,8 @@ export const InsumosPicker = ({ state, setters, renderPickerItem }) => (
 
     <Button
       success
-      style={{ alignContent: "center" }}
+      block
+      style={{ alignContent: "center", margin: 5 }}
       onPress={setters.setInsumos}
     >
       <Icon name="ios-add" color="white" />

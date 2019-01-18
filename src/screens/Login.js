@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { View, SafeAreaView } from "react-native";
 import { Form, Item, Input, Text, Container, Content } from "native-base";
 import { Button } from "../components/Button";
 import { containersStyles, inputStyles, fontStyles } from "../styles";
@@ -44,7 +45,7 @@ export class Login extends Component {
       await guardarDato("CONFIG", response.CONFIG);
       this.props.navigation.dispatch(resetAction);
     } else {
-      console.log(response.mensaje);
+      alert(response.mensaje);
       this.setState({ username: "", password: "" });
     }
   };
@@ -54,7 +55,13 @@ export class Login extends Component {
     const { username, password } = this.state;
     return (
       <Container style={authBackground}>
-        <Content>
+        <Content
+          contentContainerStyle={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
           <Text style={fontStyles.brandTitle}>Boltrack</Text>
           <Text style={fontStyles.brandSubtitle}>Logistica Satelital</Text>
           <Form>

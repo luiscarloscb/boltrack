@@ -6,3 +6,6 @@ export * from "./InfoClientes";
 export * from "./Opciones";
 export * from "./CrearVisita";
 export * from "./RegistrarCliente";
+export * from "./CrearVisitaNoProgramada";
+export * from "./UserInfo";
+export * from "./CrearOrdenPedido";

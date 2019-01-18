@@ -1,15 +1,5 @@
 import React, { Component } from "react";
-import {
-  Text,
-  Form,
-  Item,
-  Input,
-  Picker,
-  Radio,
-  Right,
-  Left,
-  Card
-} from "native-base";
+import { Thumbnail, Form, Item, Input, Picker, Card } from "native-base";
 import { Button } from "../components/Button";
 import { FormRegistrarSucursal } from "../components/FormRegistrarSucursal";
 export class RegistrarSucursal extends Component {
@@ -95,9 +85,10 @@ export class RegistrarSucursal extends Component {
                   onValueChange={setters.setCategoria}
                   placeholder="Categoria"
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
-                    <Picker.Item label={i} key={i} value={i} />
-                  ))}
+                  <Picker.Item label={"1"} key={1} value={1} />
+                  <Picker.Item label={"2"} key={2} value={2} />
+                  <Picker.Item label={"3"} key={3} value={3} />
+                  <Picker.Item label={"4"} key={4} value={4} />
                 </Picker>
               </Item>
               <Item>
@@ -109,9 +100,10 @@ export class RegistrarSucursal extends Component {
                   onValueChange={setters.setVolumenVentas}
                   placeholder="Volumen de Ventas"
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
-                    <Picker.Item label={i} key={i} value={i} />
-                  ))}
+                  <Picker.Item label={"1"} key={1} value={1} />
+                  <Picker.Item label={"2"} key={2} value={2} />
+                  <Picker.Item label={"3"} key={3} value={3} />
+                  <Picker.Item label={"4"} key={4} value={4} />
                 </Picker>
               </Item>
               <Item>
@@ -155,6 +147,21 @@ export class RegistrarSucursal extends Component {
                   <Picker.Item label="Monnet" value={2} />
                   <Picker.Item label="Ubicar" value={3} />
                 </Picker>
+              </Item>
+              <Button success full onPress={setters.setMostrarCamara}>
+                Tomar foto
+              </Button>
+              <Item style={{ justifyContent: "space-around" }}>
+                <Thumbnail
+                  key={state.SUCURSALFACHADA}
+                  large
+                  square
+                  source={{
+                    uri: state.SUCURSALFACHADA
+                      ? `data:image/jpg;base64,${state.SUCURSALFACHADA}`
+                      : "../../assets/imagen-placeholder.jpg"
+                  }}
+                />
               </Item>
               <Item>
                 <Button danger onPress={this.props.volver}>

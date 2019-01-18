@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, TouchableOpacity } from "react-native";
+import { Text, View, TouchableOpacity, Modal } from "react-native";
 import { Icon, Spinner } from "native-base";
 import { Camera, Permissions } from "expo";
 
@@ -30,41 +30,55 @@ export class Camara extends React.Component {
       );
     } else {
       return (
-        <View style={{ flex: 1 }}>
-          <Camera
-            style={{ flex: 1 }}
-            type={type}
-            ref={ref => {
-              this.camera = ref;
+        <Modal
+          animationType="slide"
+          onRequestClose={() => {}}
+          transparent
+          visible={this.props.mostrarCamara}
+        >
+          <View
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.75)",
+              position: "relative",
+              flex: 1,
+              justifyContent: "center"
             }}
           >
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: "transparent",
-                flexDirection: "row"
+            <Camera
+              style={{ flex: 1 }}
+              type={type}
+              ref={ref => {
+                this.camera = ref;
               }}
             >
-              <TouchableOpacity
+              <View
                 style={{
                   flex: 1,
-                  alignSelf: "flex-end",
-                  alignItems: "center"
+                  backgroundColor: "transparent",
+                  flexDirection: "row"
                 }}
-                onPress={() => snap(this.camera)}
               >
-                {isLoading ? (
-                  <Spinner />
-                ) : (
-                  <Icon
-                    name="ios-camera"
-                    style={{ fontSize: 100, color: "white" }}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
-          </Camera>
-        </View>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    alignSelf: "flex-end",
+                    alignItems: "center"
+                  }}
+                  onPress={() => snap(this.camera)}
+                >
+                  {isLoading ? (
+                    <Spinner />
+                  ) : (
+                    <Icon
+                      name="ios-camera"
+                      style={{ fontSize: 100, color: "white" }}
+                    />
+                  )}
+                </TouchableOpacity>
+              </View>
+            </Camera>
+          </View>
+        </Modal>
       );
     }
   }

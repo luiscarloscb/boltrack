@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Container, Content } from "native-base";
-
+import { Form } from "native-base";
+import { Camara } from "./Camera";
 export class FormRegistrarSucursal extends Component {
   state = {
     NOMBRESUCURSAL: "",
@@ -15,9 +15,28 @@ export class FormRegistrarSucursal extends Component {
     VOLUMENVENTAS: "",
     PROVEEDORPRINCIPAL: "",
     PROVEEDORSECUNDARIO: "",
-    PROVEEDORSECUNDARIOOPT: ""
+    PROVEEDORSECUNDARIOOPT: "",
+    SUCURSALFACHADA: "",
+    mostrarCamara: false,
+    camaraCargando: false
   };
-
+  snap = async (camera, cb) => {
+    this.setState({ camaraCargando: true }, async () => {
+      if (camera) {
+        let imagen = await camera.takePictureAsync({
+          base64: true,
+          quality: 0.5
+        });
+        this.setSucursalFachada(imagen.base64);
+      }
+    });
+  };
+  setSucursalFachada = SUCURSALFACHADA =>
+    this.setState({
+      SUCURSALFACHADA,
+      mostrarCamara: false,
+      camaraCargando: false
+    });
   setNombreSucursal = NOMBRESUCURSAL => this.setState({ NOMBRESUCURSAL });
   setDireccion = DIRECCION => this.setState({ DIRECCION });
   setCoordenadas = COORDENADAS => this.setState({ COORDENADAS });
@@ -34,6 +53,8 @@ export class FormRegistrarSucursal extends Component {
     this.setState({ PROVEEDORSECUNDARIO });
   setProveedorSecundarioOpt = PROVEEDORSECUNDARIOOPT =>
     this.setState({ PROVEEDORSECUNDARIOOPT });
+
+  setMostrarCamara = () => this.setState({ mostrarCamara: true });
   componentWillUnmount() {
     this.resetState();
   }
@@ -51,7 +72,10 @@ export class FormRegistrarSucursal extends Component {
       VOLUMENVENTAS: "",
       PROVEEDORPRINCIPAL: "",
       PROVEEDORSECUNDARIO: "",
-      PROVEEDORSECUNDARIOOPT: ""
+      PROVEEDORSECUNDARIOOPT: "",
+      SUCURSALFACHADA: "",
+      mostrarCamara: false,
+      camaraCargando: false
     });
   getSetters = () => ({
     setNombreSucursal: this.setNombreSucursal,
@@ -66,15 +90,20 @@ export class FormRegistrarSucursal extends Component {
     setVolumenVentas: this.setVolumenVentas,
     setProveedorPrincipal: this.setProveedorPrincipal,
     setProveedorSecundario: this.setProveedorSecundario,
-    setProveedorSecundarioOpt: this.setProveedorSecundarioOpt
+    setProveedorSecundarioOpt: this.setProveedorSecundarioOpt,
+    snap: this.snap,
+    setMostrarCamara: this.setMostrarCamara
   });
   render() {
     return (
-      <Container style={{ backgroundColor: "#EEEEEE" }}>
-        <Content style={{ paddingHorizontal: 10 }}>
-          {this.props.children(this.state, this.getSetters(), this.resetState)}
-        </Content>
-      </Container>
+      <Form>
+        <Camara
+          snap={this.snap}
+          mostrarCamara={this.state.mostrarCamara}
+          isLoading={this.state.camaraCargando}
+        />
+        {this.props.children(this.state, this.getSetters(), this.resetState)}
+      </Form>
     );
   }
 }

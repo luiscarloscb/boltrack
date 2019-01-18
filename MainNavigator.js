@@ -8,10 +8,11 @@ import {
   ListarPlanes,
   ListarVisitas,
   CrearVisita,
-  RegistrarCliente
+  RegistrarCliente,
+  CrearVisitaNoProgramada,
+  UserInfo,
+  CrearOrdenPedido
 } from "./src/screens";
-import { Camara } from "./src/components/Camera";
-import { List } from "native-base";
 
 const MainNavigator = createStackNavigator({
   Login: {
@@ -27,6 +28,20 @@ const MainNavigator = createStackNavigator({
       headerTitle: "OPCIONES"
     }
   },
+  CrearOrdenPedido: {
+    screen: CrearOrdenPedido,
+    navigationOptions: {
+      headerLeft: null,
+      headerTitle: "Orden Pedido"
+    }
+  },
+  UserInfo: {
+    screen: UserInfo,
+    navigationOptions: {
+      headerLeft: null,
+      headerTitle: "USUARIO"
+    }
+  },
   CrearPlan: {
     screen: CrearPlan,
     navigationOptions: {
@@ -37,6 +52,12 @@ const MainNavigator = createStackNavigator({
     screen: CrearVisita,
     navigationOptions: {
       headerTitle: "REALIZAR VISITA"
+    }
+  },
+  CrearVisitaNoProgramada: {
+    screen: CrearVisitaNoProgramada,
+    navigationOptions: {
+      headerTitle: "REGISTRAR VISITA"
     }
   },
   InfoClientes: {

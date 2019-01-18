@@ -1,6 +1,17 @@
-import React, { Component } from "react";
-import { Container, List, Text, Body, Card, CardItem } from "native-base";
-import { cakeGreen, pale } from "../utils/colors";
+import React, { Component, Fragment } from "react";
+import {
+  Container,
+  List,
+  ListItem,
+  Text,
+  Body,
+  Card,
+  CardItem,
+  Tabs,
+  Tab,
+  Spinner
+} from "native-base";
+import { cakeGreen, pale, red } from "../utils/colors";
 import { formatearVisitaPlaneada } from "../utils/helpers";
 import { obtenerPlanesLocal } from "../utils/localStorageAPI";
 import { SearchBar } from "./SearchBar";
@@ -11,7 +22,7 @@ export class Lista extends Component {
 
   setQuery = query => this.setState({ query });
   resetQuery = () => this.setState({ query: "" });
-
+  componentWillUnmount = () => this.setState({ visitas: [], query: "" });
   filterArrayByQuery = (arr, keys) => {
     const { CLIENTES } = this.props.data;
     const { query } = this.state;
@@ -38,6 +49,12 @@ export class Lista extends Component {
     // Fusionando visitas en localStorage con visitas en API.
     const { VISITASPLANEADAS } = this.props.data;
     const VISITASLOCALES = await obtenerPlanesLocal();
+    VISITASPLANEADAS.forEach(item => {
+      item.CARGADO = true;
+    });
+    VISITASLOCALES.forEach(item => {
+      item.CARGADO = false;
+    });
     this.setState({ visitas: [...VISITASPLANEADAS, ...VISITASLOCALES] });
   };
   async componentDidMount() {
@@ -47,55 +64,70 @@ export class Lista extends Component {
     this.cargarVisitas();
   }
 
-  sortByEstado = arr => {
-    return arr.sort((a, b) => {
-      if (a.ESTADO < b.ESTADO) {
-        return 1;
+  obtenerColor = visita => {
+    if (visita.ESTADO == "COMPLETADA") {
+      return cakeGreen;
+    } else if (visita.ESTADO == "PENDIENTE") {
+      if (visita.FECHAPLANIFICADA < new Date()) {
+        return red;
+      } else {
+        return pale;
       }
-      if (a.ESTADO > b.ESTADO) {
-        return -1;
-      }
-      return 0;
-    });
+    }
   };
-  render() {
+  renderVisitas = cb => {
     const { CLIENTES, TEMAVISITAS } = this.props.data;
-    const { visitasCompletadas, renderOptions } = this.props;
-    const visitas = this.filterArrayByQuery(this.state.visitas);
-
+    const visitas = cb(this.filterArrayByQuery(this.state.visitas));
+    const { renderOptions, estado } = this.props;
+    if (!Array.isArray(visitas)) return <Spinner />;
     return (
-      <Container style={{ backgroundColor: "#EEEEEE" }}>
+      <Fragment>
         <SearchBar
           value={this.state.query}
           onChangeText={this.setQuery}
           styles={{ marginTop: 10, height: 40 }}
         />
         <List
-          dataArray={
-            visitasCompletadas
-              ? visitas.filter(v => v.ESTADO === "COMPLETADA")
-              : this.sortByEstado(visitas)
-          }
+          dataArray={visitas.filter(visita => visita.ESTADO === estado)}
           renderRow={visita => (
-            <Card>
-              <CardItem
-                style={{
-                  backgroundColor:
-                    visita.ESTADO == "COMPLETADA" ? cakeGreen : pale
-                }}
-              >
-                <Body>
-                  <Text style={{ color: "black" }}>
-                    {formatearVisitaPlaneada(visita, CLIENTES, TEMAVISITAS)}
-                  </Text>
-                </Body>
-              </CardItem>
-              <CardItem style={{ flexDirection: "row" }}>
-                {renderOptions(visita)}
-              </CardItem>
-            </Card>
+            <ListItem style={{ flex: 1 }}>
+              <Card style={{ flex: 1 }}>
+                <CardItem
+                  style={{
+                    backgroundColor: this.obtenerColor(visita)
+                  }}
+                >
+                  <Body>
+                    <Text style={{ color: "black" }}>
+                      {formatearVisitaPlaneada(visita, CLIENTES, TEMAVISITAS)}
+                    </Text>
+                  </Body>
+                </CardItem>
+                <CardItem style={{ flexDirection: "row" }}>
+                  {renderOptions(visita)}
+                </CardItem>
+              </Card>
+            </ListItem>
           )}
         />
+      </Fragment>
+    );
+  };
+  ordenarPorNuevas = visitas =>
+    visitas.sort((a, b) => b.FECHAPLANIFICADA - a.FECHAPLANIFICADA);
+  mostrarVencidas = visitas =>
+    visitas.filter(a => a.FECHAPLANIFICADA < new Date());
+  mostrarLocales = visitas => visitas.filter(a => !a.CARGADO);
+  render() {
+    return (
+      <Container style={{ backgroundColor: "#EEEEEE" }}>
+        <Tabs>
+          <Tab heading="Todas">{this.renderVisitas(this.ordenarPorNuevas)}</Tab>
+          <Tab heading="Vencidas">
+            {this.renderVisitas(this.mostrarVencidas)}
+          </Tab>
+          <Tab heading="Local">{this.renderVisitas(this.mostrarLocales)}</Tab>
+        </Tabs>
       </Container>
     );
   }

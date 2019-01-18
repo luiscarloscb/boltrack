@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Container, Content } from "native-base";
+import { Form } from "native-base";
 
 export class FormPlanearVisita extends Component {
   state = {
@@ -10,7 +10,7 @@ export class FormPlanearVisita extends Component {
     IDSUCURSAL: -1,
     IDTEMAVISITA: -1,
     insumo: -1,
-    cantidad: "0",
+    cantidad: "",
     DESARROLLOTAREA: "",
     OBJETIVO: "",
     INSUMOS: [],
@@ -46,7 +46,7 @@ export class FormPlanearVisita extends Component {
   setInsumos = () => {
     //Agrega el insumo y la cantidad seleccionada en la lista INSUMOS
     const { insumo, cantidad } = this.state;
-    if (insumo !== "" || parseInt(cantidad) > 0) {
+    if (insumo !== "" && parseInt(cantidad) > 0) {
       let nuevoInsumo = {
         insumoID: insumo,
         cantidad: parseInt(cantidad)
@@ -76,7 +76,7 @@ export class FormPlanearVisita extends Component {
       IDSUCURSAL: -1,
       IDTEMAVISITA: -1,
       insumo: -1,
-      cantidad: "0",
+      cantidad: "",
       DESARROLLOTAREA: "",
       OBJETIVO: "",
       INSUMOS: [],
@@ -93,8 +93,7 @@ export class FormPlanearVisita extends Component {
   encontrarContacto = (SUCURSALES, IDSUCURSAL) => {
     // Encuentra el contacto para la sucursal seleccionada
     const sucursal = SUCURSALES.find(sucur => sucur.sucursalId == IDSUCURSAL);
-    console.log(sucursal);
-    return sucursal.sucursalContacto;
+    return sucursal ? sucursal.sucursalContacto : "SUCURSAL NO SELECCIONADA";
   };
   getSetters = () => ({
     setFechaPlanificada: this.setFechaPlanificada,
@@ -111,11 +110,9 @@ export class FormPlanearVisita extends Component {
   });
   render() {
     return (
-      <Container style={{ backgroundColor: "#EEEEEE" }}>
-        <Content style={{ paddingHorizontal: 10 }}>
-          {this.props.children(this.state, this.getSetters(), this.resetState)}
-        </Content>
-      </Container>
+      <Form>
+        {this.props.children(this.state, this.getSetters(), this.resetState)}
+      </Form>
     );
   }
 }

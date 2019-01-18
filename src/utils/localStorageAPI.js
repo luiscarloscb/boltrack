@@ -38,6 +38,11 @@ export const guardarPlanLocal = async (plan, cb) => {
     const PLANES = await obtenerDato("PLANES");
     plan.IDVISITA = uuidv4();
     plan.ESTADO = "PENDIENTE";
+    plan.FECHAPLANIFICADA =
+      parseInt((new Date(plan.FECHAPLANIFICADA).getTime() / 1000).toFixed(0)) *
+      1000;
+    plan.FECHATAREA =
+      parseInt((new Date(plan.FECHATAREA).getTime() / 1000).toFixed(0)) * 1000;
     if (Array.isArray(PLANES)) {
       await guardarDato("PLANES", [...PLANES, plan]);
       cb();
@@ -64,6 +69,13 @@ export const obtenerPlanesLocal = async (plan, cb) => {
 export const guardarVisitaRealizada = async (visita, cb) => {
   try {
     visita.ESTADO = "COMPLETADA";
+    visita.FECHAPROXIMAVISITA =
+      parseInt(
+        (new Date(visita.FECHAPROXIMAVISITA).getTime() / 1000).toFixed(0)
+      ) * 1000;
+    visita.FECHAVISITA =
+      parseInt((new Date(visita.FECHAVISITA).getTime() / 1000).toFixed(0)) *
+      1000;
     const PLANES = await obtenerDato("PLANES");
     await eliminarDato("PLANES");
     const visitas = PLANES.filter(plan => plan.IDVISITA !== visita.IDVISITA);
@@ -75,14 +87,14 @@ export const guardarVisitaRealizada = async (visita, cb) => {
   }
 };
 
-export const eliminarVisita = async IDVISITA => {
+export const eliminarVisita = async (IDVISITA, cb = () => {}) => {
   try {
     const PLANES = await obtenerDato("PLANES");
     await eliminarDato("PLANES");
     const visitas = PLANES.filter(plan => plan.IDVISITA !== IDVISITA);
     await guardarDato("PLANES", visitas);
-    alert("La visita se elimino correctamente");
+    cb();
   } catch (e) {
-    alert("400 error");
+    console.log("Error eliminando el plan de visita de localStorage");
   }
 };

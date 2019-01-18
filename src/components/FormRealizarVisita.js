@@ -1,14 +1,13 @@
 import React, { Component } from "react";
 import { Location, Permissions } from "expo";
-import { Container, Content } from "native-base";
-import { Button } from "./Button";
+import { Form } from "native-base";
 import { Camara } from "./Camera";
 
 export class FormRealizarVisita extends Component {
   state = {
-    FECHAVISITA: "",
+    FECHAVISITA: new Date(),
     LOGROSVISITA: "",
-    FECHAPROXIMAVISITA: "",
+    FECHAPROXIMAVISITA: new Date(),
     COORDENADASGPS: [],
     IMAGENES: [],
     cantidad: "",
@@ -22,6 +21,7 @@ export class FormRealizarVisita extends Component {
   componentWillUnmount() {
     this.resetState();
   }
+  setCoordenadas = COORDENADASGPS => this.setState({ COORDENADASGPS });
   setCantidad = cantidad => this.setState({ cantidad });
   setInsumo = insumo => this.setState({ insumo });
   setInsumos = () => {
@@ -57,37 +57,6 @@ export class FormRealizarVisita extends Component {
       camaraCargando: false
     }));
 
-  componentDidMount() {
-    Permissions.getAsync(Permissions.LOCATION)
-      .then(({ status }) => {
-        if (status === "granted") {
-          return this.obtenerCoordenadas();
-        }
-
-        this.setState(() => ({ status }));
-      })
-      .catch(error => {
-        console.warn("Error getting Location permission: ", error);
-
-        this.setState(() => ({ status: "undetermined" }));
-      });
-  }
-  obtenerCoordenadas = async () => {
-    Location.watchPositionAsync(
-      {
-        enableHighAccuracy: true,
-        timeInterval: 1,
-        distanceInterval: 1
-      },
-      ({ coords }) => {
-        const { latitude, longitude } = coords;
-        this.setState(() => ({
-          COORDENADASGPS: [latitude, longitude],
-          status: "granted"
-        }));
-      }
-    );
-  };
   snap = async (camera, cb) => {
     this.setState({ camaraCargando: true }, async () => {
       if (camera) {
@@ -119,17 +88,20 @@ export class FormRealizarVisita extends Component {
     setMostrarCamara: this.setMostrarCamara,
     setCantidad: this.setCantidad,
     setInsumo: this.setInsumo,
-    setInsumos: this.setInsumos
+    setInsumos: this.setInsumos,
+    setCoordenadas: this.setCoordenadas,
+    snap: this.snap
   });
   render() {
-    return this.state.mostrarCamara ? (
-      <Camara snap={this.snap} isLoading={this.state.camaraCargando} />
-    ) : (
-      <Container style={{ backgroundColor: "#EEEEEE" }}>
-        <Content style={{ paddingHorizontal: 10 }}>
-          {this.props.children(this.state, this.getSetters(), this.resetState)}
-        </Content>
-      </Container>
+    return (
+      <Form>
+        <Camara
+          snap={this.snap}
+          mostrarCamara={this.state.mostrarCamara}
+          isLoading={this.state.camaraCargando}
+        />
+        {this.props.children(this.state, this.getSetters(), this.resetState)}
+      </Form>
     );
   }
 }

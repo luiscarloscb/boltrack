@@ -34,15 +34,22 @@ export const formatearVisitaPlaneada = (VISITA, CLIENTES, TEMAVISITAS) => {
   const { sucursalNom, sucursalContacto } = sucursales.find(
     item => item.sucursalId == VISITA.IDSUCURSAL
   );
-  const { temaNombre } = TEMAVISITAS.find(
-    item => item.temaID == VISITA.IDTEMAVISITA
-  );
+  let temaNombre;
+  if (VISITA.IDTEMAVISITA) {
+    temaNombre = TEMAVISITAS.find(item => item.temaID == VISITA.IDTEMAVISITA)
+      .temaNombre;
+  }
+
   return `
     NOMBRE CLIENTE: ${clienteNom} \n
     SUCURSAL: ${sucursalNom} \n
     CONTACTO: ${sucursalContacto} \n
-    FECHA PLANEADA: ${convertTime(VISITA.FECHAPLANIFICADA)} \n
-    TEMA VISITA: ${temaNombre} \n
+    FECHA PLANEADA: ${
+      VISITA.FECHAPLANIFICADA
+        ? convertTime(VISITA.FECHAPLANIFICADA)
+        : "La visita no fue planeada"
+    } \n
+    TEMA VISITA: ${temaNombre ? temaNombre : "No asignado"} \n
     `;
 };
 
