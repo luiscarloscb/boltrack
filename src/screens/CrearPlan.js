@@ -1,8 +1,11 @@
 import React, { Component, Fragment } from "react";
 import { guardarPlanLocal } from "../utils/localStorageAPI";
-import { FormPlanearVisita } from "../components/FormPlanearVisita";
-import { InsumosPicker } from "../components/InsumosPicker";
-import { ListaInsumos } from "../components/ListaInsumos";
+import {
+  Catalogo,
+  InsumosPicker,
+  ListaInsumos,
+  FormPlanearVisita
+} from "../components";
 import {
   Text,
   Item,
@@ -10,24 +13,25 @@ import {
   DatePicker,
   Picker,
   Label,
-  Body,
-  Header,
   Card,
-  Left,
-  Icon,
-  Right,
   Container,
   Content
 } from "native-base";
 import { Button } from "../components/Button";
-import { StackActions, NavigationActions } from "react-navigation";
-import { SearchBar } from "../components/SearchBar";
 import escapeRegExp from "escape-string-regexp";
 import sortBy from "sort-by";
 export class CrearPlan extends Component {
-  state = { query: "" };
-  componentWillUnmount = () => this.setState({ query: "" });
-  setQuery = query => this.setState({ query });
+  state = {
+    query: "",
+    catalogoClientes: false,
+    catalogoTipoTarea: false,
+    catalogoSucursales: false,
+    catalogoTemaVisita: false
+  };
+
+  toggleCatalogo = catalogo =>
+    this.setState(state => ({ [catalogo]: !state[catalogo] }));
+
   guardarPlan = async (state, resetState) => {
     // Valida campos requeridos, guarda si todo esta ok
     const { insumo, cantidad, sucursales, contacto, ...rest } = state;
@@ -40,35 +44,7 @@ export class CrearPlan extends Component {
           this.props.navigation.goBack()
         );
   };
-  filterArrayByQuery = (arr, keys) => {
-    const { query } = this.state;
 
-    let showingItems;
-    if (query) {
-      const match = new RegExp(escapeRegExp(query), "i");
-      showingItems = arr.filter(item => match.test(item[keys[1]]));
-    } else {
-      showingItems = arr;
-    }
-
-    return showingItems.sort(sortBy(keys[1]));
-  };
-  renderPickerItem = (arr, keys) => {
-    // Renderiza las opciones disponibles de un array de objectos [{ID, NOMBRE}]
-    const showingItems = this.filterArrayByQuery(arr, keys);
-    return showingItems.length > 0 ? (
-      showingItems.map(item => (
-        <Picker.Item
-          key={item[keys[1]]}
-          label={item[keys[1]]}
-          value={item[keys[0]]}
-        />
-      ))
-    ) : (
-      <Picker.Item label="NO TIENE ASSIGNADO NINGUN ITEM" value={""} />
-    );
-  };
-  resetQuery = () => this.setState({ query: "" });
   render() {
     const {
       TIPOTAREAS,
@@ -118,114 +94,43 @@ export class CrearPlan extends Component {
                     </Text>
                   </Item>
                   <Item>
-                    <Picker
-                      mode="dropdown"
-                      style={{ width: 250 }}
-                      selectedValue={state.IDTIPOTAREA}
-                      onValueChange={value => {
-                        this.resetQuery();
-                        setters.setTipoTarea(value);
-                      }}
-                      placeholder={"Tipo Tarea"}
-                      renderHeader={backAction => (
-                        <Header>
-                          <Left>
-                            <Button transparent onPress={backAction}>
-                              <Icon
-                                name="ios-arrow-back"
-                                style={{ color: "black" }}
-                              />
-                            </Button>
-                          </Left>
-                          <Body style={{ flex: 3 }}>
-                            <SearchBar
-                              value={this.state.query}
-                              onChangeText={this.setQuery}
-                            />
-                          </Body>
-                          <Right />
-                        </Header>
-                      )}
-                    >
-                      {this.renderPickerItem(TIPOTAREAS, [
-                        "tareaID",
-                        "tareaNombre"
-                      ])}
-                    </Picker>
+                    <Catalogo
+                      placeholder="Tipo Tarea"
+                      data={TIPOTAREAS}
+                      seleccionarItem={setters.setTipoTarea}
+                      toggleCatalogo={() =>
+                        this.toggleCatalogo("catalogoTipoTarea")
+                      }
+                      visible={this.state.catalogoTipoTarea}
+                      label="tareaNombre"
+                      value="tareaID"
+                    />
                   </Item>
                   <Item>
-                    <Picker
-                      note
-                      mode="dropdown"
-                      style={{ width: 250 }}
-                      selectedValue={state.IDCLIENTE}
-                      onValueChange={value => {
-                        this.resetQuery();
-                        setters.setCliente(value);
-                      }}
-                      placeholder={"Cliente"}
-                      renderHeader={backAction => (
-                        <Header>
-                          <Left>
-                            <Button transparent onPress={backAction}>
-                              <Icon
-                                name="ios-arrow-back"
-                                style={{ color: "black" }}
-                              />
-                            </Button>
-                          </Left>
-                          <Body style={{ flex: 3 }}>
-                            <SearchBar
-                              value={this.state.query}
-                              onChangeText={this.setQuery}
-                            />
-                          </Body>
-                          <Right />
-                        </Header>
-                      )}
-                    >
-                      {this.renderPickerItem(CLIENTES, [
-                        "clienteID",
-                        "clienteNom"
-                      ])}
-                    </Picker>
+                    <Catalogo
+                      placeholder="Cliente"
+                      data={CLIENTES}
+                      seleccionarItem={setters.setCliente}
+                      toggleCatalogo={() =>
+                        this.toggleCatalogo("catalogoClientes")
+                      }
+                      visible={this.state.catalogoClientes}
+                      label="clienteNom"
+                      value="clienteID"
+                    />
                   </Item>
                   <Item>
-                    <Picker
-                      note
-                      mode="dropdown"
-                      style={{ width: 250 }}
-                      selectedValue={state.IDSUCURSAL}
-                      onValueChange={value => {
-                        this.resetQuery();
-                        setters.setSucursal(value);
-                      }}
-                      renderHeader={backAction => (
-                        <Header>
-                          <Left>
-                            <Button transparent onPress={backAction}>
-                              <Icon
-                                name="ios-arrow-back"
-                                style={{ color: "black" }}
-                              />
-                            </Button>
-                          </Left>
-                          <Body style={{ flex: 3 }}>
-                            <SearchBar
-                              value={this.state.query}
-                              onChangeText={this.setQuery}
-                            />
-                          </Body>
-                          <Right />
-                        </Header>
-                      )}
-                      placeholder={"Sucursal"}
-                    >
-                      {this.renderPickerItem(state.sucursales, [
-                        "sucursalId",
-                        "sucursalNom"
-                      ])}
-                    </Picker>
+                    <Catalogo
+                      placeholder="Sucursales"
+                      data={state.sucursales}
+                      seleccionarItem={setters.setSucursal}
+                      toggleCatalogo={() =>
+                        this.toggleCatalogo("catalogoSucursales")
+                      }
+                      visible={this.state.catalogoSucursales}
+                      label="sucursalNom"
+                      value="sucursalId"
+                    />
                   </Item>
                   <Item disabled>
                     <Input
@@ -235,41 +140,17 @@ export class CrearPlan extends Component {
                     />
                   </Item>
                   <Item>
-                    <Picker
-                      note
-                      mode="dropdown"
-                      style={{ width: 250 }}
-                      selectedValue={state.IDTEMAVISITA}
-                      onValueChange={value => {
-                        this.resetQuery();
-                        setters.setTemaVisita(value);
-                      }}
-                      renderHeader={backAction => (
-                        <Header>
-                          <Left>
-                            <Button transparent onPress={backAction}>
-                              <Icon
-                                name="ios-arrow-back"
-                                style={{ color: "black" }}
-                              />
-                            </Button>
-                          </Left>
-                          <Body style={{ flex: 3 }}>
-                            <SearchBar
-                              value={this.state.query}
-                              onChangeText={this.setQuery}
-                            />
-                          </Body>
-                          <Right />
-                        </Header>
-                      )}
-                      placeholder={"Tema Visita"}
-                    >
-                      {this.renderPickerItem(TEMAVISITAS, [
-                        "temaID",
-                        "temaNombre"
-                      ])}
-                    </Picker>
+                    <Catalogo
+                      placeholder="Tema Visita"
+                      data={TEMAVISITAS}
+                      seleccionarItem={setters.setTemaVisita}
+                      toggleCatalogo={() =>
+                        this.toggleCatalogo("catalogoTemaVisita")
+                      }
+                      visible={this.state.catalogoTemaVisita}
+                      label="temaNombre"
+                      value="temaID"
+                    />
                   </Item>
                   <Item>
                     <InsumosPicker
@@ -279,12 +160,7 @@ export class CrearPlan extends Component {
                         setQuery: this.setQuery,
                         resetQuery: this.resetQuery
                       }}
-                      renderPickerItem={() =>
-                        this.renderPickerItem(INSUMOS, [
-                          "insumoID",
-                          "insumoNombre"
-                        ])
-                      }
+                      insumos={INSUMOS}
                     />
                   </Item>
                   <Item>

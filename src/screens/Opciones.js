@@ -60,7 +60,7 @@ export class Opciones extends Component {
                 })
               }
             >
-              <Text>CrearOrdenPedido</Text>
+              <Text>Crear Orden Pedido</Text>
             </Button>
             <Button
               style={buttonStyle}

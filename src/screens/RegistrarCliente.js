@@ -144,3 +144,7 @@ export class RegistrarCliente extends Component {
     );
   }
 }
+
+//Asignar Vendedor cod
+//asignar
+//correo sucursal

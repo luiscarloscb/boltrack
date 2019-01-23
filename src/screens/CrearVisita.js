@@ -142,7 +142,7 @@ export class CrearVisita extends Component {
                           resetQuery: this.resetQuery,
                           setQuery: this.setQuery
                         }}
-                        renderPickerItem={this.renderInsumosItem}
+                        insumos={INSUMOS}
                       />
                     </Item>
                     <Item>

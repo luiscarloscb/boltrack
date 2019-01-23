@@ -15,12 +15,7 @@ export const ListaArticulos = ({ data, insumos }) => (
             "    " +
             "PRECIO BASE: " +
             item.precioBase.toString() +
-            "    " +
-            "PRECIO SEC 1: " +
-            item.precioSecundario.toString() +
-            "    " +
-            "PRECIO SEC 2: " +
-            item.precioSecundarioOpt.toString()}
+            "    "}
         </Text>
       </ListItem>
     )}

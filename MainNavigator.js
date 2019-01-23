@@ -31,7 +31,6 @@ const MainNavigator = createStackNavigator({
   CrearOrdenPedido: {
     screen: CrearOrdenPedido,
     navigationOptions: {
-      headerLeft: null,
       headerTitle: "Orden Pedido"
     }
   },

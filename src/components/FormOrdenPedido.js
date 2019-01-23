@@ -54,9 +54,9 @@ export class FormOrdenPedido extends Component {
     if (
       ARTICULO !== "" &&
       parseInt(CANTIDAD) > 0 &&
-      parseInt(PRECIOBASE) > 0 &&
-      parseInt(PRECIOSECUNDARIO) > 0 &&
-      parseInt(PRECIOSECUNDARIOOPT) > 0
+      parseInt(PRECIOBASE) > 0
+      // && parseInt(PRECIOSECUNDARIO) > 0 &&
+      // parseInt(PRECIOSECUNDARIOOPT) > 0
     ) {
       let nuevoArticulo = {
         articuloID: ARTICULO,

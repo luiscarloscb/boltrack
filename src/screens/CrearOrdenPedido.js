@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import { Catalogo, FormOrdenPedido } from "../components";
 import {
   Content,
   Container,
@@ -15,7 +16,6 @@ import {
   Button,
   Icon
 } from "native-base";
-import { FormOrdenPedido } from "../components/FormOrdenPedido";
 import { ArticulosPicker } from "../components/ArticulosPicker";
 import { SearchBar } from "../components/SearchBar";
 import { ListaArticulos } from "../components/ListaArticulos";
@@ -23,39 +23,15 @@ import escapeRegExp from "escape-string-regexp";
 import sortBy from "sort-by";
 
 export class CrearOrdenPedido extends Component {
-  state = { query: "" };
-
-  setQuery = query => this.setState({ query });
-  resetQuery = () => this.setState({ query: "" });
-
-  filterArrayByQuery = (arr, keys) => {
-    const { query } = this.state;
-
-    let showingItems;
-    if (query) {
-      const match = new RegExp(escapeRegExp(query), "i");
-      showingItems = arr.filter(item => match.test(item[keys[1]]));
-    } else {
-      showingItems = arr;
-    }
-
-    return showingItems.sort(sortBy(keys[1]));
+  state = {
+    query: "",
+    catalogoClientes: false,
+    catalogoSucursales: false,
+    catalogoFormasDePago: false
   };
-  renderPickerItem = (arr, keys) => {
-    // Renderiza las opciones disponibles de un array de objectos [{ID, NOMBRE}]
-    const showingItems = this.filterArrayByQuery(arr, keys);
-    return showingItems.length > 0 ? (
-      showingItems.map(item => (
-        <Picker.Item
-          key={item[keys[1]]}
-          label={item[keys[1]]}
-          value={item[keys[0]]}
-        />
-      ))
-    ) : (
-      <Picker.Item label="NO TIENE ASSIGNADO NINGUN ITEM" value={""} />
-    );
-  };
+  toggleCatalogo = catalogo =>
+    this.setState(state => ({ [catalogo]: !state[catalogo] }));
+
   render() {
     const { CLIENTES, INSUMOS } = this.props.navigation.state.params.DATA;
     return (
@@ -66,78 +42,30 @@ export class CrearOrdenPedido extends Component {
               {(state, setters) => (
                 <Fragment>
                   <Item>
-                    <Picker
-                      note
-                      mode="dropdown"
-                      style={{ width: 250 }}
-                      selectedValue={state.IDCLIENTE}
-                      onValueChange={value => {
-                        this.resetQuery();
-                        setters.setCliente(value);
-                      }}
-                      placeholder={"Cliente"}
-                      renderHeader={backAction => (
-                        <Header>
-                          <Left>
-                            <Button transparent onPress={backAction}>
-                              <Icon
-                                name="ios-arrow-back"
-                                style={{ color: "black" }}
-                              />
-                            </Button>
-                          </Left>
-                          <Body style={{ flex: 3 }}>
-                            <SearchBar
-                              value={this.state.query}
-                              onChangeText={this.setQuery}
-                            />
-                          </Body>
-                          <Right />
-                        </Header>
-                      )}
-                    >
-                      {this.renderPickerItem(CLIENTES, [
-                        "clienteID",
-                        "clienteNom"
-                      ])}
-                    </Picker>
+                    <Catalogo
+                      placeholder="Cliente"
+                      data={CLIENTES}
+                      seleccionarItem={setters.setCliente}
+                      toggleCatalogo={() =>
+                        this.toggleCatalogo("catalogoClientes")
+                      }
+                      visible={this.state.catalogoClientes}
+                      label="clienteNom"
+                      value="clienteID"
+                    />
                   </Item>
                   <Item>
-                    <Picker
-                      note
-                      mode="dropdown"
-                      style={{ width: 250 }}
-                      selectedValue={state.IDSUCURSAL}
-                      onValueChange={value => {
-                        this.resetQuery();
-                        setters.setSucursal(value);
-                      }}
-                      renderHeader={backAction => (
-                        <Header>
-                          <Left>
-                            <Button transparent onPress={backAction}>
-                              <Icon
-                                name="ios-arrow-back"
-                                style={{ color: "black" }}
-                              />
-                            </Button>
-                          </Left>
-                          <Body style={{ flex: 3 }}>
-                            <SearchBar
-                              value={this.state.query}
-                              onChangeText={this.setQuery}
-                            />
-                          </Body>
-                          <Right />
-                        </Header>
-                      )}
-                      placeholder={"Sucursal"}
-                    >
-                      {this.renderPickerItem(state.sucursales, [
-                        "sucursalId",
-                        "sucursalNom"
-                      ])}
-                    </Picker>
+                    <Catalogo
+                      placeholder="Sucursales"
+                      data={state.sucursales}
+                      seleccionarItem={setters.setSucursal}
+                      toggleCatalogo={() =>
+                        this.toggleCatalogo("catalogoSucursales")
+                      }
+                      visible={this.state.catalogoSucursales}
+                      label="sucursalNom"
+                      value="sucursalId"
+                    />
                   </Item>
                   <Item>
                     <DatePicker
@@ -157,48 +85,21 @@ export class CrearOrdenPedido extends Component {
                     </Text>
                   </Item>
                   <Item>
-                    <Picker
-                      note
-                      mode="dropdown"
-                      style={{ width: 250 }}
-                      selectedValue={state.FORMAPAGO}
-                      onValueChange={value => {
-                        this.resetQuery();
-                        setters.setFormaPago(value);
-                      }}
-                      renderHeader={backAction => (
-                        <Header>
-                          <Left>
-                            <Button transparent onPress={backAction}>
-                              <Icon
-                                name="ios-arrow-back"
-                                style={{ color: "black" }}
-                              />
-                            </Button>
-                          </Left>
-                          <Body style={{ flex: 3 }}>
-                            <SearchBar
-                              value={this.state.query}
-                              onChangeText={this.setQuery}
-                            />
-                          </Body>
-                          <Right />
-                        </Header>
-                      )}
-                      placeholder={"Forma de Pago"}
-                    >
-                      <Picker.Item
-                        key={1}
-                        label={"Efectivo"}
-                        value={"Efectivo"}
-                      />
-                      <Picker.Item
-                        key={2}
-                        label={"Credito"}
-                        value={"Credito"}
-                      />
-                      <Picker.Item key={3} label={"Cuotas"} value={"Cuotas"} />
-                    </Picker>
+                    <Catalogo
+                      placeholder="Tipo de Pago"
+                      data={[
+                        { formaPagoNom: "Efectivo", formaPagoId: 1 },
+                        { formaPagoNom: "Credito", formaPagoId: 2 },
+                        { formaPagoNom: "Cuotas", formaPagoId: 3 }
+                      ]}
+                      seleccionarItem={setters.setFormaPago}
+                      toggleCatalogo={() =>
+                        this.toggleCatalogo("catalogoFormasDePago")
+                      }
+                      visible={this.state.catalogoFormasDePago}
+                      label="formaPagoNom"
+                      value="formaPagoId"
+                    />
                   </Item>
                   <Item>
                     <Input
@@ -211,12 +112,7 @@ export class CrearOrdenPedido extends Component {
                   <ArticulosPicker
                     state={{ ...state, query: this.state.query }}
                     setters={{ ...setters, resetQuery: this.resetQuery }}
-                    renderPickerItem={() =>
-                      this.renderPickerItem(INSUMOS, [
-                        "insumoID",
-                        "insumoNombre"
-                      ])
-                    }
+                    insumos={INSUMOS}
                   />
                   <Item>
                     <ListaArticulos insumos={INSUMOS} data={state.ARTICULOS} />
@@ -238,3 +134,7 @@ export class CrearOrdenPedido extends Component {
 // * Forma de pago (Efectivo/Credito/Cuotas (Nro. de Cuotas))
 // * Articulos o Servicios ( [nombre, cantidad, precioBase/precio1/precio2] )
 // * Fecha comprometida de entrega
+
+// articulos - modificar - eliminar 1 - eliminar todos.
+
+//correos adicinal.
