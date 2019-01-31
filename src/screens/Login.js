@@ -20,7 +20,7 @@ export class Login extends Component {
     if (TOKEN) {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      if (!hasHardware && !isEnrolled) {
+      if (hasHardware && isEnrolled) {
         const {
           success,
           error
