@@ -31,8 +31,7 @@ export class Catalogo extends Component {
     } else {
       showingItems = arr;
     }
-
-    return showingItems.sort(sortBy(sortProp));
+    return showingItems;
   };
   render() {
     const {
@@ -66,7 +65,8 @@ export class Catalogo extends Component {
             style={{
               backgroundColor: "rgba(0, 0, 0, 0.75)",
               position: "relative",
-              justifyContent: "center"
+              justifyContent: "center",
+              marginTop: 50
             }}
           >
             <CardItem>

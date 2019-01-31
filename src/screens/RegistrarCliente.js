@@ -5,17 +5,22 @@ import {
   Text,
   Item,
   Input,
-  Picker,
   Radio,
-  Card
+  Card,
+  Button
 } from "native-base";
-import { Button } from "../components/Button";
-import { FormRegistrarCliente } from "../components/FormRegistrarCliente";
 import { RegistrarSucursal } from "./RegistrarSucursal";
+import { Catalogo, FormRegistrarCliente } from "../components";
 export class RegistrarCliente extends Component {
   state = {
-    seccion: 0
+    seccion: 0,
+    catalogoActividades: false,
+    catalogoEmpleados: false,
+    catalogoRubros: false
   };
+
+  toggleCatalogo = catalogo =>
+    this.setState(state => ({ [catalogo]: !state[catalogo] }));
   irRegistrarSucursal = () => {
     this.setState({ seccion: 1 });
   };
@@ -35,35 +40,43 @@ export class RegistrarCliente extends Component {
               />
             </Item>
             <Item>
-              <Picker
-                note
-                mode="dropdown"
-                style={{ width: 250 }}
-                selectedValue={state.RUBROID}
-                onValueChange={setters.setRubro}
-                placeholder={"RUBRO"}
-                androidMode={"RUBRO"}
-              >
-                <Picker.Item label="RUBRO" value={""} />
-                <Picker.Item label="Petrolero" value={1} />
-                <Picker.Item label="Agronomico" value={2} />
-                <Picker.Item label="Seguridad" value={3} />
-                <Picker.Item label="Gubernamental" value={4} />
-              </Picker>
+              <Input
+                value={state.CORREO}
+                onChangeText={setters.setCorreo}
+                placeholder="Correo"
+              />
             </Item>
             <Item>
-              <Picker
-                note
-                mode="dropdown"
-                style={{ width: 250 }}
-                selectedValue={state.ACITIVIDADPRINCIPALID}
-                onValueChange={setters.setActividadPrincipal}
-                placeholder={"Actividad Principal"}
-              >
-                <Picker.Item label="Distribucion" value={1} />
-                <Picker.Item label="Produccion" value={2} />
-                <Picker.Item label="Servicios" value={3} />
-              </Picker>
+              <Catalogo
+                placeholder="RUBRO"
+                data={[
+                  { rubroNom: "PETROLERO", rubroID: 1 },
+                  { rubroNom: "AGRONOMICO", rubroID: 2 }
+                ]}
+                seleccionarItem={setters.setRubro}
+                toggleCatalogo={() => this.toggleCatalogo("catalogoRubros")}
+                visible={this.state.catalogoRubros}
+                label="rubroNom"
+                value="rubroID"
+              />
+            </Item>
+            <Item>
+              <Item>
+                <Catalogo
+                  placeholder="Actividad"
+                  data={[
+                    { actividadNom: "DISTRIBUCION", actividadID: 1 },
+                    { actividadNom: "SERVICIOS", actividadID: 2 }
+                  ]}
+                  seleccionarItem={setters.setActividadPrincipal}
+                  toggleCatalogo={() =>
+                    this.toggleCatalogo("catalogoActividades")
+                  }
+                  visible={this.state.catalogoActividades}
+                  label="actividadNom"
+                  value="actividadID"
+                />
+              </Item>
             </Item>
             <Item>
               <Input
@@ -77,6 +90,20 @@ export class RegistrarCliente extends Component {
                 value={state.ACITIVIDADSECUNDARIAOPT}
                 onChangeText={setters.setActividadSecundariaOpt}
                 placeholder={"Actividad Secudaria 2"}
+              />
+            </Item>
+            <Item>
+              <Catalogo
+                placeholder="Asignar Empleado"
+                data={[
+                  { empleadoNom: "Ramon Gonzales", empleadoID: 1 },
+                  { empleadoNom: "Juan Perez", empleadoID: 2 }
+                ]}
+                seleccionarItem={setters.setEmpleado}
+                toggleCatalogo={() => this.toggleCatalogo("catalogoEmpleados")}
+                visible={this.state.catalogoEmpleados}
+                label="empleadoNom"
+                value="empleadoID"
               />
             </Item>
             <Item>
@@ -125,7 +152,7 @@ export class RegistrarCliente extends Component {
               />
             </Item>
             <Button success onPress={() => this.irRegistrarSucursal()}>
-              Siguiente
+              <Text>Siguiente</Text>
             </Button>
           </Fragment>
         )}

@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from "react";
-
 import {
   Thumbnail,
   Text,
@@ -7,7 +6,6 @@ import {
   Input,
   DatePicker,
   Label,
-  Picker,
   Card,
   Container,
   Content
@@ -15,16 +13,18 @@ import {
 import { Button } from "../components/Button";
 import { FormRealizarVisita } from "../components/FormRealizarVisita";
 import { VisitaDetalles } from "../components/VisitaDetalles";
-import { InsumosPicker } from "../components/InsumosPicker";
-import { ListaInsumos } from "../components/ListaInsumos";
 import { guardarVisitaRealizada } from "../utils/localStorageAPI";
-import { GPSInput } from "../components/GPSInput";
-import { StackActions, NavigationActions } from "react-navigation";
+import { GPSInput } from "../components";
 export class CrearVisita extends Component {
   state = {
     mostrarPlanDetallado: false,
-    query: ""
+    query: "",
+    habilitarGPS: true
   };
+  onToggleGPS = () =>
+    this.setState(state => ({ habilitarGPS: !state.habilitarGPS }));
+  toggleCatalogo = () =>
+    this.setState(state => ({ campañaCatalogo: !state.campañaCatalogo }));
   componentDidMount() {}
   setMostrarPlanDetallado = () =>
     this.setState(state => ({
@@ -36,38 +36,32 @@ export class CrearVisita extends Component {
       status,
       mostrarCamara,
       camaraCargando,
-      insumo,
-      cantidad,
       ...rest
     } = state;
     const { visita, DATA } = this.props.navigation.state.params;
-
-    await guardarVisitaRealizada({ ...visita, ...rest }, () =>
-      this.props.navigation.goBack()
-    );
+    if (
+      this.state.habilitarGPS &&
+      state.COORDENADASGPS[0] &&
+      state.COORDENADASGPS[1]
+    ) {
+      await guardarVisitaRealizada({ ...visita, ...rest }, () =>
+        this.props.navigation.goBack()
+      );
+    } else {
+      if (!this.state.habilitarGPS) {
+        await guardarVisitaRealizada({ ...visita, ...rest }, () =>
+          this.props.navigation.goBack()
+        );
+      } else {
+        alert("No se pudo obtener cordenadas GPS");
+      }
+    }
   };
   setQuery = query => this.setState({ query });
   resetQuery = () => this.setState({ query: "" });
-  renderInsumosItem = () => {
-    const {
-      DATA: { INSUMOS },
-      visita
-    } = this.props.navigation.state.params;
-    return INSUMOS.length > 0 ? (
-      INSUMOS.map(item => (
-        <Picker.Item
-          key={item["insumoID"]}
-          label={item["insumoNombre"]}
-          value={item["insumoID"]}
-        />
-      ))
-    ) : (
-      <Picker.Item label="NO TIENE ASSIGNADO NINGUN ITEM" value={""} />
-    );
-  };
+
   render() {
-    const { mostrarPlanDetallado } = this.state;
-    const { INSUMOS } = this.props.navigation.state.params.DATA;
+    const { mostrarPlanDetallado, habilitarGPS } = this.state;
     return (
       <Container style={{ backgroundColor: "#EEEEEE" }}>
         <Content style={{ paddingHorizontal: 10 }}>
@@ -102,7 +96,7 @@ export class CrearVisita extends Component {
                         onDateChange={setters.setFechaVisita}
                       />
                       <Text>
-                        Fecha Tarea:{" "}
+                        Fecha Tarea:
                         {state.FECHAVISITA.toString().substr(4, 12)}
                       </Text>
                     </Item>
@@ -134,26 +128,12 @@ export class CrearVisita extends Component {
                         {state.FECHAPROXIMAVISITA.toString().substr(4, 12)}
                       </Text>
                     </Item>
-                    <Item>
-                      <InsumosPicker
-                        state={{ ...state, query: this.state.query }}
-                        setters={{
-                          ...setters,
-                          resetQuery: this.resetQuery,
-                          setQuery: this.setQuery
-                        }}
-                        insumos={INSUMOS}
-                      />
-                    </Item>
-                    <Item>
-                      <ListaInsumos
-                        data={state.INSUMOSGASTADOS}
-                        insumos={INSUMOS}
-                      />
-                    </Item>
+
                     <GPSInput
                       value={state.COORDENADASGPS}
                       setCoordenadas={setters.setCoordenadas}
+                      isGpsEnable={this.state.habilitarGPS}
+                      onEnableGPS={this.onToggleGPS}
                     />
                     <Button success full onPress={setters.setMostrarCamara}>
                       Tomar foto

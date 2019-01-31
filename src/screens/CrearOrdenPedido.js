@@ -1,44 +1,47 @@
 import React, { Component, Fragment } from "react";
-import { Catalogo, FormOrdenPedido } from "../components";
+import { FORMA_PAGO_DATA, CAMPANA_DATA } from "../utils/const";
+import {
+  Catalogo,
+  FormOrdenPedido,
+  PreOrden,
+  ArticulosPicker,
+  ListaArticulos
+} from "../components";
 import {
   Content,
   Container,
   Item,
   Input,
-  Picker,
   DatePicker,
   Card,
   Text,
-  Header,
-  Body,
-  Right,
-  Left,
-  Button,
-  Icon
+  Button
 } from "native-base";
-import { ArticulosPicker } from "../components/ArticulosPicker";
-import { SearchBar } from "../components/SearchBar";
-import { ListaArticulos } from "../components/ListaArticulos";
-import escapeRegExp from "escape-string-regexp";
-import sortBy from "sort-by";
 
 export class CrearOrdenPedido extends Component {
   state = {
     query: "",
     catalogoClientes: false,
     catalogoSucursales: false,
-    catalogoFormasDePago: false
+    catalogoFormasDePago: false,
+    preOrden: false,
+    catalogoCampanas: false,
+    catalogoCorreos: false
   };
   toggleCatalogo = catalogo =>
     this.setState(state => ({ [catalogo]: !state[catalogo] }));
 
   render() {
-    const { CLIENTES, INSUMOS } = this.props.navigation.state.params.DATA;
+    const {
+      CLIENTES,
+      INSUMOS,
+      CAMPANAS
+    } = this.props.navigation.state.params.DATA;
     return (
       <Container style={{ backgroundColor: "#EEEEEE" }}>
         <Content style={{ paddingHorizontal: 10 }}>
           <Card>
-            <FormOrdenPedido clientes={CLIENTES}>
+            <FormOrdenPedido CLIENTES={CLIENTES} INSUMOS={INSUMOS}>
               {(state, setters) => (
                 <Fragment>
                   <Item>
@@ -68,30 +71,56 @@ export class CrearOrdenPedido extends Component {
                     />
                   </Item>
                   <Item>
+                    <Catalogo
+                      placeholder="Campaña"
+                      data={CAMPANAS}
+                      seleccionarItem={setters.setCampana}
+                      toggleCatalogo={() =>
+                        this.toggleCatalogo("catalogoCampanas")
+                      }
+                      visible={this.state.catalogoCampanas}
+                      label="campanaNombre"
+                      value="campanaID"
+                    />
+                  </Item>
+                  <Item>
                     <DatePicker
                       defaultDate={new Date()}
                       minimumDate={new Date()}
                       timeZoneOffsetInMinutes={undefined}
                       modalTransparent={false}
                       animationType={"fade"}
-                      androidMode={"Fecha de la orden"}
+                      androidMode={"default"}
                       textStyle={{ color: "green" }}
                       placeHolderTextStyle={{ color: "#d3d3d3" }}
                       onDateChange={setters.setFechaOrden}
                     />
                     <Text>
-                      Fecha de la orden:{" "}
+                      Fecha orden:
                       {state.FECHAORDEN.toString().substr(4, 12)}
+                    </Text>
+                  </Item>
+                  <Item>
+                    <DatePicker
+                      defaultDate={new Date()}
+                      minimumDate={new Date()}
+                      timeZoneOffsetInMinutes={undefined}
+                      modalTransparent={false}
+                      animationType={"fade"}
+                      androidMode={"default"}
+                      textStyle={{ color: "green" }}
+                      placeHolderTextStyle={{ color: "#d3d3d3" }}
+                      onDateChange={setters.setFechaEntrega}
+                    />
+                    <Text>
+                      Fecha Entrega:
+                      {state.FECHAENTREGA.toString().substr(4, 12)}
                     </Text>
                   </Item>
                   <Item>
                     <Catalogo
                       placeholder="Tipo de Pago"
-                      data={[
-                        { formaPagoNom: "Efectivo", formaPagoId: 1 },
-                        { formaPagoNom: "Credito", formaPagoId: 2 },
-                        { formaPagoNom: "Cuotas", formaPagoId: 3 }
-                      ]}
+                      data={FORMA_PAGO_DATA}
                       seleccionarItem={setters.setFormaPago}
                       toggleCatalogo={() =>
                         this.toggleCatalogo("catalogoFormasDePago")
@@ -109,14 +138,36 @@ export class CrearOrdenPedido extends Component {
                       keyboardType="numeric"
                     />
                   </Item>
+                  <Item>
+                    <Input
+                      value={state.CORREOOPT}
+                      onChangeText={setters.setCorreoOpt}
+                      placeholder="Correo Opcional"
+                    />
+                  </Item>
                   <ArticulosPicker
                     state={{ ...state, query: this.state.query }}
                     setters={{ ...setters, resetQuery: this.resetQuery }}
                     insumos={INSUMOS}
                   />
                   <Item>
-                    <ListaArticulos insumos={INSUMOS} data={state.ARTICULOS} />
+                    <ListaArticulos
+                      insumos={INSUMOS}
+                      data={state.ARTICULOS}
+                      onDelete={setters.eliminarArticulo}
+                    />
                   </Item>
+                  <PreOrden
+                    INSUMOS={INSUMOS}
+                    CLIENTES={CLIENTES}
+                    orden={state}
+                    visible={this.state.preOrden}
+                    OnToggle={() => this.toggleCatalogo("preOrden")}
+                  />
+
+                  <Button onPress={setters.onSave} success block>
+                    <Text>Guardar Orden</Text>
+                  </Button>
                 </Fragment>
               )}
             </FormOrdenPedido>
@@ -126,15 +177,3 @@ export class CrearOrdenPedido extends Component {
     );
   }
 }
-
-// ***Orden de Pedido
-// * Cliente
-// * Sucursal
-// * Fecha generacion de Orden (fecha actual por defecto pero que deje escoger)
-// * Forma de pago (Efectivo/Credito/Cuotas (Nro. de Cuotas))
-// * Articulos o Servicios ( [nombre, cantidad, precioBase/precio1/precio2] )
-// * Fecha comprometida de entrega
-
-// articulos - modificar - eliminar 1 - eliminar todos.
-
-//correos adicinal.

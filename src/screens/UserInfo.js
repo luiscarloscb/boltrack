@@ -10,6 +10,15 @@ import {
   Button,
   Icon
 } from "native-base";
+import { eliminarDato } from "../utils/localStorageAPI";
+resetPin = async () => {
+  try {
+    await eliminarDato("PIN");
+    alert("Inicie sesion nuevamente para crear nuevo pin");
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 export const UserInfo = props => (
   <Container style={{ backgroundColor: "#EEEEEE" }}>
@@ -27,6 +36,11 @@ export const UserInfo = props => (
           <Text>
             {`EMPRESA: ${props.navigation.state.params.DATA.EMPRESA}`}
           </Text>
+        </CardItem>
+        <CardItem>
+          <Button danger block onPress={resetPin}>
+            <Text>RESETEAR PIN</Text>
+          </Button>
         </CardItem>
       </Card>
     </Content>

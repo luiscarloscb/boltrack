@@ -13,9 +13,12 @@ export class FormRegistrarCliente extends Component {
     REPRESENTANTELEGAL: "",
     isChecked: false,
     LIMITECREDITO: "",
-    CODIGO: ""
+    CODIGO: "",
+    CORREO: "",
+    EMPLEADO: ""
   };
-
+  setEmpleado = EMPLEADO => this.setState({ EMPLEADO });
+  setCorreo = CORREO => this.setState({ CORREO });
   setRazonSocial = RAZONSOCIAL => this.setState({ RAZONSOCIAL });
   setRubro = RUBROID => this.setState({ RUBROID });
   setActividadPrincipal = ACTIVIDADPRINCIPAL =>
@@ -48,7 +51,8 @@ export class FormRegistrarCliente extends Component {
       REPRESENTANTELEGAL: "",
       isChecked: false,
       LIMITECREDITO: "",
-      CODIGO: ""
+      CODIGO: "",
+      CORREO: ""
     });
   getSetters = () => ({
     setRazonSocial: this.setRazonSocial,
@@ -61,7 +65,9 @@ export class FormRegistrarCliente extends Component {
     setRepresentanteLegal: this.setRepresentanteLegal,
     toggleIsChecked: this.toggleIsChecked,
     setLimiteCredito: this.setLimiteCredito,
-    setCodigo: this.setCodigo
+    setCodigo: this.setCodigo,
+    setCorreo: this.setCorreo,
+    setEmpleado: this.setEmpleado
   });
   render() {
     return (

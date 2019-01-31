@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from "react";
 import { Catalogo, FormVisitaNoProgramada } from "../components";
 import { Item, Card, Content, Container } from "native-base";
-
+import { CAMPANA_DATA } from "../utils/const";
 export class CrearVisitaNoProgramada extends Component {
   state = {
     catalogoClientes: false,
-    catalogoSucursales: false
+    catalogoSucursales: false,
+    catalogoCampanas: false
   };
 
   toggleCatalogo = catalogo =>
@@ -23,6 +24,19 @@ export class CrearVisitaNoProgramada extends Component {
             >
               {(state, setters) => (
                 <Fragment>
+                  <Item>
+                    <Catalogo
+                      placeholder="Campaña"
+                      data={CAMPANA_DATA}
+                      seleccionarItem={setters.setCampana}
+                      toggleCatalogo={() =>
+                        this.toggleCatalogo("catalogoCampanas")
+                      }
+                      visible={this.state.catalogoCampanas}
+                      label="campanaNom"
+                      value="campanaID"
+                    />
+                  </Item>
                   <Item>
                     <Catalogo
                       placeholder="Cliente"

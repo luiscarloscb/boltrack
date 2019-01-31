@@ -9,7 +9,8 @@ import {
   CardItem,
   Tabs,
   Tab,
-  Spinner
+  Spinner,
+  H3
 } from "native-base";
 import { cakeGreen, pale, red } from "../utils/colors";
 import { formatearVisitaPlaneada } from "../utils/helpers";
@@ -17,6 +18,9 @@ import { obtenerPlanesLocal } from "../utils/localStorageAPI";
 import { SearchBar } from "./SearchBar";
 import escapeRegExp from "escape-string-regexp";
 import sortBy from "sort-by";
+
+const textStyle = { color: "black", fontSize: 14, marginBottom: 12 };
+
 export class Lista extends Component {
   state = { visitas: [], query: "" };
 
@@ -31,7 +35,10 @@ export class Lista extends Component {
       let clienteNom = CLIENTES.find(
         cliente => cliente.clienteID == item.IDCLIENTE
       );
-      newItem = { ...item, CLIENTENOM: clienteNom.clienteNom };
+      newItem = {
+        ...item,
+        CLIENTENOM: clienteNom.clienteNom
+      };
       return newItem;
     });
 
@@ -89,26 +96,39 @@ export class Lista extends Component {
         />
         <List
           dataArray={visitas.filter(visita => visita.ESTADO === estado)}
-          renderRow={visita => (
-            <ListItem style={{ flex: 1 }}>
-              <Card style={{ flex: 1 }}>
-                <CardItem
-                  style={{
-                    backgroundColor: this.obtenerColor(visita)
-                  }}
-                >
-                  <Body>
-                    <Text style={{ color: "black" }}>
-                      {formatearVisitaPlaneada(visita, CLIENTES, TEMAVISITAS)}
-                    </Text>
-                  </Body>
-                </CardItem>
-                <CardItem style={{ flexDirection: "row" }}>
-                  {renderOptions(visita)}
-                </CardItem>
-              </Card>
-            </ListItem>
-          )}
+          renderRow={visita => {
+            const visitaPlaneada = formatearVisitaPlaneada(
+              visita,
+              CLIENTES,
+              TEMAVISITAS
+            );
+            return (
+              <ListItem style={{ flex: 1 }}>
+                <Card style={{ flex: 1 }}>
+                  <CardItem
+                    style={{
+                      backgroundColor: this.obtenerColor(visita)
+                    }}
+                  >
+                    <Body>
+                      <Text style={textStyle}>
+                        CLIENTE: {visitaPlaneada.clienteNom}
+                      </Text>
+                      <Text style={textStyle}>
+                        SUCURSAL: {visitaPlaneada.sucursalNom}
+                      </Text>
+                      <Text style={textStyle}>
+                        PLANIFICADA: {visitaPlaneada.fechaPlanificada}
+                      </Text>
+                    </Body>
+                  </CardItem>
+                  <CardItem style={{ flexDirection: "row" }}>
+                    {renderOptions(visita)}
+                  </CardItem>
+                </Card>
+              </ListItem>
+            );
+          }}
         />
       </Fragment>
     );

@@ -76,13 +76,14 @@ export const guardarVisitaRealizada = async (visita, cb) => {
     visita.FECHAVISITA =
       parseInt((new Date(visita.FECHAVISITA).getTime() / 1000).toFixed(0)) *
       1000;
-    const PLANES = await obtenerDato("PLANES");
+    const PLANES = await obtenerPlanesLocal();
     await eliminarDato("PLANES");
     const visitas = PLANES.filter(plan => plan.IDVISITA !== visita.IDVISITA);
     await guardarDato("PLANES", visitas.concat(visita));
     alert("200 OK");
     cb();
   } catch (e) {
+    console.log(e);
     alert("400 error");
   }
 };
@@ -95,6 +96,39 @@ export const eliminarVisita = async (IDVISITA, cb = () => {}) => {
     await guardarDato("PLANES", visitas);
     cb();
   } catch (e) {
-    console.log("Error eliminando el plan de visita de localStorage");
+    console.log(
+      `Error eliminando el plan de visita con id: ${IDVISITA} localStorage`
+    );
+  }
+};
+
+export const obtenerOrdenes = async () => {
+  const ORDENES = await obtenerDato("ORDENES");
+  if (Array.isArray(ORDENES)) {
+    return ORDENES;
+  }
+  return [];
+};
+
+export const guardarOrden = async (orden, cb = () => {}) => {
+  try {
+    orden.IDORDEN = uuidv4();
+    const ORDENES = await obtenerOrdenes();
+    await guardarDato("ORDENES", ORDENES.concat(orden));
+    cb();
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const eliminarOrden = async (IDORDEN, cb = () => {}) => {
+  try {
+    const ORDENES = await obtenerDato("ORDENES");
+    await eliminarDato("ORDENES");
+    const ordenes = ORDENES.filter(orden => orden.IDORDEN !== IDORDEN);
+    await guardarDato("PLANES", ordenes);
+    cb();
+  } catch (e) {
+    console.log(`Error eliminando la orden con id ${IDORDEN} de localStorage`);
   }
 };

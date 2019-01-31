@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { Location, Permissions } from "expo";
-import { Item, Input } from "native-base";
+import { Item, Input, Button, Text, Radio } from "native-base";
 export class GPSInput extends Component {
   componentDidMount = async () => {
     Permissions.askAsync(Permissions.LOCATION).then(({ status }) => {
@@ -27,9 +27,21 @@ export class GPSInput extends Component {
 
   render() {
     return (
-      <Item disabled>
-        <Input value={JSON.stringify(this.props.value)} />
-      </Item>
+      <Fragment>
+        <Item>
+          <Button transparent onPress={this.props.onEnableGPS}>
+            <Text>Enviar Informacion GPS</Text>
+          </Button>
+          <Radio selected={this.props.isGpsEnable} value={1} />
+        </Item>
+        {this.props.isGpsEnable ? (
+          <Item disabled>
+            <Input value={JSON.stringify(this.props.value)} />
+          </Item>
+        ) : (
+          <Text>"No GPS Habilitado"</Text>
+        )}
+      </Fragment>
     );
   }
 }

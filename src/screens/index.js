@@ -9,3 +9,4 @@ export * from "./RegistrarCliente";
 export * from "./CrearVisitaNoProgramada";
 export * from "./UserInfo";
 export * from "./CrearOrdenPedido";
+export * from "./ListaOrdenes";

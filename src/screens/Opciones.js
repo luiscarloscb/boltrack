@@ -7,7 +7,8 @@ import {
   FooterTab,
   Icon,
   Button,
-  Text
+  Text,
+  Spinner
 } from "native-base";
 //import { Button } from "../components/Button";
 import { Confirm } from "../components/Confirm";
@@ -16,24 +17,35 @@ import { eliminarDatos } from "../utils/localStorageAPI";
 
 const buttonStyle = { margin: 10, minHeight: 48, minWidth: 100 };
 export class Opciones extends Component {
-  PARAMS = {};
   state = {
-    mostrarConfirmacion: false
+    mostrarConfirmacion: false,
+    DATA: {},
+    CONFIG: {},
+    TOKEN: ""
   };
   toggleConfirmacion = () =>
     this.setState(state => ({
       mostrarConfirmacion: !state.mostrarConfirmacion
     }));
   async componentDidMount() {
-    this.PARAMS.DATA = await obtenerDato("DATA");
-    this.PARAMS.CONFIG = await obtenerDato("CONFIG");
-    this.PARAMS.TOKEN = await obtenerDato("TOKEN");
+    this.setState({
+      DATA: await obtenerDato("DATA"),
+      CONFIG: await obtenerDato("CONFIG"),
+      TOKEN: await obtenerDato("TOKEN")
+    });
   }
   desconectar = async () => {
-    await eliminarDatos(["TOKEN", "DATA", "CONFIG", "PLANES"]);
+    await eliminarDatos(["TOKEN", "DATA", "CONFIG", "PLANES", "ORDENES"]);
     this.props.navigation.navigate("Login");
   };
   render() {
+    const { DATA, CONFIG, TOKEN } = this.state;
+    if (Object.keys(DATA).length === 0) return <Spinner />;
+    const PARAMS = {
+      DATA,
+      CONFIG,
+      TOKEN
+    };
     return (
       <Container style={{ backgroundColor: "#EEEEEE" }}>
         <Content style={{ paddingHorizontal: 10 }}>
@@ -44,19 +56,20 @@ export class Opciones extends Component {
               success
               onPress={() =>
                 this.props.navigation.navigate("RegistrarCliente", {
-                  ...this.PARAMS
+                  ...PARAMS
                 })
               }
             >
               <Text>Registrar Cliente</Text>
             </Button>
+
             <Button
               style={buttonStyle}
               block
               success
               onPress={() =>
                 this.props.navigation.navigate("CrearOrdenPedido", {
-                  ...this.PARAMS
+                  ...PARAMS
                 })
               }
             >
@@ -67,7 +80,19 @@ export class Opciones extends Component {
               block
               success
               onPress={() =>
-                this.props.navigation.navigate("CrearPlan", { ...this.PARAMS })
+                this.props.navigation.navigate("ListaOrdenes", {
+                  ...PARAMS
+                })
+              }
+            >
+              <Text>Ordenes</Text>
+            </Button>
+            <Button
+              style={buttonStyle}
+              block
+              success
+              onPress={() =>
+                this.props.navigation.navigate("CrearPlan", { ...PARAMS })
               }
             >
               <Text>Crear Plan de Visita</Text>
@@ -78,7 +103,7 @@ export class Opciones extends Component {
               success
               onPress={() =>
                 this.props.navigation.navigate("CrearVisitaNoProgramada", {
-                  ...this.PARAMS
+                  ...PARAMS
                 })
               }
             >
@@ -90,9 +115,10 @@ export class Opciones extends Component {
               success
               onPress={() =>
                 this.props.navigation.navigate("ListarPlanes", {
-                  ...this.PARAMS
+                  ...PARAMS
                 })
               }
+              disabled={this.state.DATA.CLIENTES.length === 0}
             >
               <Text>Planes de Visita</Text>
             </Button>
@@ -102,9 +128,10 @@ export class Opciones extends Component {
               success
               onPress={() =>
                 this.props.navigation.navigate("ListarVisitas", {
-                  ...this.PARAMS
+                  ...PARAMS
                 })
               }
+              disabled={this.state.DATA.CLIENTES.length === 0}
             >
               <Text>Visitas Realizadas</Text>
             </Button>
@@ -115,9 +142,10 @@ export class Opciones extends Component {
               success
               onPress={() =>
                 this.props.navigation.navigate("InfoClientes", {
-                  ...this.PARAMS
+                  ...PARAMS
                 })
               }
+              disabled={this.state.DATA.CLIENTES.length === 0}
             >
               <Text>Informacion Clientes</Text>
             </Button>
@@ -147,7 +175,7 @@ export class Opciones extends Component {
             <Button
               vertical
               onPress={() =>
-                this.props.navigation.navigate("UserInfo", { ...this.PARAMS })
+                this.props.navigation.navigate("UserInfo", { ...PARAMS })
               }
             >
               <Icon name="ios-person" />

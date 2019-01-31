@@ -1,32 +1,27 @@
 import React, { Component, Fragment } from "react";
 import { guardarPlanLocal } from "../utils/localStorageAPI";
-import {
-  Catalogo,
-  InsumosPicker,
-  ListaInsumos,
-  FormPlanearVisita
-} from "../components";
+import { Catalogo, FormPlanearVisita } from "../components";
+import { CAMPANA_DATA } from "../utils/const";
 import {
   Text,
   Item,
   Input,
   DatePicker,
-  Picker,
   Label,
   Card,
   Container,
-  Content
+  Content,
+  Button
 } from "native-base";
-import { Button } from "../components/Button";
-import escapeRegExp from "escape-string-regexp";
-import sortBy from "sort-by";
+
 export class CrearPlan extends Component {
   state = {
     query: "",
     catalogoClientes: false,
     catalogoTipoTarea: false,
     catalogoSucursales: false,
-    catalogoTemaVisita: false
+    catalogoTemaVisita: false,
+    catalogoCampanas: false
   };
 
   toggleCatalogo = catalogo =>
@@ -34,15 +29,17 @@ export class CrearPlan extends Component {
 
   guardarPlan = async (state, resetState) => {
     // Valida campos requeridos, guarda si todo esta ok
-    const { insumo, cantidad, sucursales, contacto, ...rest } = state;
+    const { insumo, cantidad, sucursales, ...rest } = state;
     const { DATA } = this.props.navigation.state.params;
     rest.IDCLIENTE == -1
       ? alert("Seleccione un cliente")
       : rest.IDSUCURSAL == -1
       ? alert("Seleccione una sucursal")
-      : await guardarPlanLocal({ ...rest }, () =>
+      : rest.IDCAMPANA !== -1
+      ? await guardarPlanLocal({ ...rest }, () =>
           this.props.navigation.goBack()
-        );
+        )
+      : alert("Seleccione una campana");
   };
 
   render() {
@@ -50,14 +47,13 @@ export class CrearPlan extends Component {
       TIPOTAREAS,
       CLIENTES,
       TEMAVISITAS,
-      INSUMOS,
-      ...rest
+      CAMPANAS
     } = this.props.navigation.state.params.DATA;
     return (
       <Container style={{ backgroundColor: "#EEEEEE" }}>
-        <Content style={{ paddingHorizontal: 10 }}>
+        <Content padder style={{ paddingHorizontal: 10 }}>
           <Card>
-            <FormPlanearVisita clientes={CLIENTES}>
+            <FormPlanearVisita CLIENTES={CLIENTES}>
               {(state, setters, resetState) => (
                 <Fragment>
                   <Item>
@@ -67,7 +63,7 @@ export class CrearPlan extends Component {
                       timeZoneOffsetInMinutes={undefined}
                       modalTransparent={false}
                       animationType={"fade"}
-                      androidMode={"Fecha para la tarea"}
+                      androidMode={"default"}
                       textStyle={{ color: "green" }}
                       placeHolderTextStyle={{ color: "#d3d3d3" }}
                       onDateChange={setters.setFechaTarea}
@@ -83,7 +79,7 @@ export class CrearPlan extends Component {
                       timeZoneOffsetInMinutes={undefined}
                       modalTransparent={false}
                       animationType={"fade"}
-                      androidMode={"Fecha Planificada"}
+                      androidMode={"default"}
                       textStyle={{ color: "green" }}
                       placeHolderTextStyle={{ color: "#d3d3d3" }}
                       onDateChange={setters.setFechaPlanificada}
@@ -95,15 +91,15 @@ export class CrearPlan extends Component {
                   </Item>
                   <Item>
                     <Catalogo
-                      placeholder="Tipo Tarea"
-                      data={TIPOTAREAS}
-                      seleccionarItem={setters.setTipoTarea}
+                      placeholder="Campaña"
+                      data={CAMPANAS}
+                      seleccionarItem={setters.setCampana}
                       toggleCatalogo={() =>
-                        this.toggleCatalogo("catalogoTipoTarea")
+                        this.toggleCatalogo("catalogoCampanas")
                       }
-                      visible={this.state.catalogoTipoTarea}
-                      label="tareaNombre"
-                      value="tareaID"
+                      visible={this.state.catalogoCampanas}
+                      label="campanaNombre"
+                      value="campanaID"
                     />
                   </Item>
                   <Item>
@@ -132,11 +128,25 @@ export class CrearPlan extends Component {
                       value="sucursalId"
                     />
                   </Item>
-                  <Item disabled>
+                  <Item>
+                    <Catalogo
+                      placeholder="Tipo Tarea"
+                      data={TIPOTAREAS}
+                      seleccionarItem={setters.setTipoTarea}
+                      toggleCatalogo={() =>
+                        this.toggleCatalogo("catalogoTipoTarea")
+                      }
+                      visible={this.state.catalogoTipoTarea}
+                      label="tareaNombre"
+                      value="tareaID"
+                    />
+                  </Item>
+
+                  <Item>
                     <Input
-                      disabled
                       placeholder="Contacto"
-                      value={state.contacto}
+                      value={state.CONTACTO}
+                      onChangeText={setters.setContacto}
                     />
                   </Item>
                   <Item>
@@ -151,20 +161,6 @@ export class CrearPlan extends Component {
                       label="temaNombre"
                       value="temaID"
                     />
-                  </Item>
-                  <Item>
-                    <InsumosPicker
-                      state={{ ...state, query: this.state.query }}
-                      setters={{
-                        ...setters,
-                        setQuery: this.setQuery,
-                        resetQuery: this.resetQuery
-                      }}
-                      insumos={INSUMOS}
-                    />
-                  </Item>
-                  <Item>
-                    <ListaInsumos data={state.INSUMOS} insumos={INSUMOS} />
                   </Item>
                   <Item>
                     <Item stackedLabel>
@@ -191,7 +187,7 @@ export class CrearPlan extends Component {
                     block
                     onPress={() => this.guardarPlan(state, resetState)}
                   >
-                    Guardar Plan
+                    <Text>Guardar Plan</Text>
                   </Button>
                 </Fragment>
               )}

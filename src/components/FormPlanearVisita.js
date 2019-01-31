@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Form } from "native-base";
-
+import { encontrarSucursal, encontrarContacto } from "../utils/helpers";
 export class FormPlanearVisita extends Component {
   state = {
     FECHATAREA: new Date(),
@@ -9,13 +9,11 @@ export class FormPlanearVisita extends Component {
     IDCLIENTE: -1,
     IDSUCURSAL: -1,
     IDTEMAVISITA: -1,
-    insumo: -1,
-    cantidad: "",
+    IDCAMPANA: -1,
     DESARROLLOTAREA: "",
     OBJETIVO: "",
-    INSUMOS: [],
     sucursales: [],
-    contacto: ""
+    CONTACTO: ""
   };
   componentDidMount() {
     if (this.props.initialState) {
@@ -28,41 +26,22 @@ export class FormPlanearVisita extends Component {
   setFechaTarea = FECHATAREA => this.setState({ FECHATAREA });
   setFechaPlanificada = FECHAPLANIFICADA => this.setState({ FECHAPLANIFICADA });
   setTipoTarea = IDTIPOTAREA => this.setState({ IDTIPOTAREA });
+  setCampana = IDCAMPANA => this.setState({ IDCAMPANA });
   setCliente = IDCLIENTE =>
     this.setState(() => ({
       IDCLIENTE,
-      sucursales: this.encontrarSucursal(IDCLIENTE)
+      sucursales: encontrarSucursal(IDCLIENTE, this.props.CLIENTES)
     }));
 
   setSucursal = IDSUCURSAL => {
     this.setState(state => ({
       IDSUCURSAL,
-      contacto: this.encontrarContacto(state.sucursales, IDSUCURSAL)
+      CONTACTO: encontrarContacto(state.sucursales, IDSUCURSAL)
     }));
   };
   setTemaVisita = IDTEMAVISITA => this.setState({ IDTEMAVISITA });
   setCantidad = cantidad => this.setState({ cantidad });
-  setInsumo = insumo => this.setState({ insumo });
-  setInsumos = () => {
-    //Agrega el insumo y la cantidad seleccionada en la lista INSUMOS
-    const { insumo, cantidad } = this.state;
-    if (insumo !== "" && parseInt(cantidad) > 0) {
-      let nuevoInsumo = {
-        insumoID: insumo,
-        cantidad: parseInt(cantidad)
-      };
-      this.setState(state => {
-        return {
-          INSUMOS: state.INSUMOS.concat(nuevoInsumo),
-          insumo: "",
-          cantidad: ""
-        };
-      });
-    } else {
-      alert("Porfavor llene los campos correctamente");
-    }
-  };
-
+  setContacto = CONTACTO => this.setState({ CONTACTO });
   setDesarrolloTarea = DESARROLLOTAREA => this.setState({ DESARROLLOTAREA });
   setObjetivo = OBJETIVO => this.setState({ OBJETIVO });
 
@@ -79,22 +58,11 @@ export class FormPlanearVisita extends Component {
       cantidad: "",
       DESARROLLOTAREA: "",
       OBJETIVO: "",
-      INSUMOS: [],
-      sucursales: []
+      sucursales: [],
+      CONTACTO: "",
+      IDCAMPANA: -1
     });
 
-  encontrarSucursal = IDCLIENTE => {
-    // Encuentra las sucursales disponibles por cliente seleccionado
-    const { clientes } = this.props;
-    const cliente = clientes.find(cliente => cliente.clienteID == IDCLIENTE);
-    return cliente ? cliente.sucursales : [];
-  };
-
-  encontrarContacto = (SUCURSALES, IDSUCURSAL) => {
-    // Encuentra el contacto para la sucursal seleccionada
-    const sucursal = SUCURSALES.find(sucur => sucur.sucursalId == IDSUCURSAL);
-    return sucursal ? sucursal.sucursalContacto : "SUCURSAL NO SELECCIONADA";
-  };
   getSetters = () => ({
     setFechaPlanificada: this.setFechaPlanificada,
     setFechaTarea: this.setFechaTarea,
@@ -102,11 +70,11 @@ export class FormPlanearVisita extends Component {
     setCliente: this.setCliente,
     setSucursal: this.setSucursal,
     setTemaVisita: this.setTemaVisita,
-    setInsumo: this.setInsumo,
     setCantidad: this.setCantidad,
     setDesarrolloTarea: this.setDesarrolloTarea,
     setObjetivo: this.setObjetivo,
-    setInsumos: this.setInsumos
+    setContacto: this.setContacto,
+    setCampana: this.setCampana
   });
   render() {
     return (

@@ -1,23 +1,27 @@
 import React, { Component } from "react";
-import { View } from "react-native";
-import { createAppContainer } from "react-navigation";
+import { View, AppState } from "react-native";
+import { createAppContainer, NavigationActions } from "react-navigation";
 import MainNavigator from "./MainNavigator";
 import { headerColor } from "./src/utils/colors";
 import StatusBar from "./src/components/StatusBar";
-import { eliminarDatos } from "./src/utils/localStorageAPI";
+
+import { guardarDato, eliminarDatos } from "./src/utils/localStorageAPI";
 import { Root } from "native-base";
 import { Font, AppLoading } from "expo";
 const AppContainer = createAppContainer(MainNavigator);
 
 export default class App extends Component {
-  //async componentDidMount() {
-  //  eliminarDatos(["TOKEN", "DATA", "CONFIG", "PLANES"]);
-  //}
   constructor(props) {
     super(props);
-    this.state = { loading: true };
+    this.state = {
+      loading: true,
+      appState: AppState.currentState
+    };
   }
-
+  async componentDidMount() {
+    AppState.addEventListener("change", this._handleAppStateChange);
+    //   eliminarDatos(["TOKEN", "DATA", "CONFIG", "PLANES", "ORDENES"]);
+  }
   async componentWillMount() {
     await Font.loadAsync({
       Roboto: require("native-base/Fonts/Roboto.ttf"),
@@ -25,6 +29,19 @@ export default class App extends Component {
     });
     this.setState({ loading: false });
   }
+  componentWillUnmount() {
+    AppState.removeEventListener("change", this._handleAppStateChange);
+  }
+
+  _handleAppStateChange = nextAppState => {
+    if (this.state.appState.match(/background/) && nextAppState === "active") {
+      this.navigator &&
+        this.navigator.dispatch(
+          NavigationActions.navigate({ routeName: "Login" })
+        );
+    }
+    this.setState({ appState: nextAppState });
+  };
 
   render() {
     if (this.state.loading) {
@@ -37,7 +54,11 @@ export default class App extends Component {
     return (
       <View style={{ flex: 1 }}>
         <StatusBar backgroundColor={headerColor} barStyle="light-content" />
-        <AppContainer />
+        <AppContainer
+          ref={nav => {
+            this.navigator = nav;
+          }}
+        />
       </View>
     );
   }

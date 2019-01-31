@@ -1,22 +1,38 @@
 import React, { Component } from "react";
-import { View, SafeAreaView } from "react-native";
+import { LocalAuthentication } from "expo";
 import { Form, Item, Input, Text, Container, Content } from "native-base";
 import { Button } from "../components/Button";
 import { containersStyles, inputStyles, fontStyles } from "../styles";
 import { login } from "../utils/boltrackAPI";
 import { guardarDato, obtenerDato } from "../utils/localStorageAPI";
 import { StackActions, NavigationActions } from "react-navigation";
-
+import { PinAuth } from "../components/PinAuth";
 export class Login extends Component {
   state = {
     username: "",
-    password: ""
+    password: "",
+    showPin: false,
+    pinText: ""
   };
 
   async componentDidMount() {
     const TOKEN = await obtenerDato("TOKEN");
     if (TOKEN) {
-      this.props.navigation.navigate("Opciones");
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!hasHardware && !isEnrolled) {
+        const {
+          success,
+          error
+        } = await LocalAuthentication.authenticateAsync();
+        if (success) {
+          this.props.navigation.navigate("Opciones");
+        } else {
+          console.log(error);
+        }
+      } else {
+        this.obtenerPinText();
+      }
     }
   }
   componentWillUnmount() {
@@ -43,17 +59,57 @@ export class Login extends Component {
       await guardarDato("TOKEN", response.TOKEN);
       await guardarDato("DATA", response.DATA);
       await guardarDato("CONFIG", response.CONFIG);
-      this.props.navigation.dispatch(resetAction);
+      const PIN = await obtenerDato("PIN");
+      if (PIN) {
+        this.props.navigation.dispatch(resetAction);
+      } else {
+        this.setState({ showPin: true, pinText: "Ingrese Nuevo Pin" });
+      }
     } else {
       alert(response.mensaje);
       this.setState({ username: "", password: "" });
     }
   };
-
+  setPin = async (val, clear) => {
+    const PIN = await obtenerDato("PIN");
+    if (PIN) {
+      //REQUEST PIN
+      if (PIN === val) {
+        this.props.navigation.navigate("Opciones");
+        this.setState({ showPin: false });
+        clear();
+      } else {
+        clear();
+        alert("Pin incorrecto");
+      }
+    } else {
+      //CREATE PIN
+      await guardarDato("PIN", val);
+      this.setState({ showPin: false });
+      clear();
+      alert("pin guardado correctamente");
+    }
+  };
+  obtenerPinText = async () => {
+    const PIN = await obtenerDato("PIN");
+    if (PIN) {
+      this.setState({
+        showPin: true,
+        pinText: "Ingrese Pin"
+      });
+    } else {
+      this.setState({
+        showPin: true,
+        pinText: "Ingrese Nuevo Pin"
+      });
+    }
+  };
   render() {
     const { authBackground } = containersStyles;
-    const { username, password } = this.state;
-    return (
+    const { username, password, showPin } = this.state;
+    return showPin ? (
+      <PinAuth onComplete={this.setPin} info={this.state.pinText} />
+    ) : (
       <Container style={authBackground}>
         <Content
           contentContainerStyle={{

@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Location, Permissions } from "expo";
 import { Form } from "native-base";
 import { Camara } from "./Camera";
 
@@ -10,9 +9,7 @@ export class FormRealizarVisita extends Component {
     FECHAPROXIMAVISITA: new Date(),
     COORDENADASGPS: [],
     IMAGENES: [],
-    cantidad: "",
-    insumo: "",
-    INSUMOSGASTADOS: [],
+    CAMPAÑA: "",
     errorMessage: "",
     status: "",
     mostrarCamara: false,
@@ -21,28 +18,10 @@ export class FormRealizarVisita extends Component {
   componentWillUnmount() {
     this.resetState();
   }
+  setCampaña = CAMPAÑA => this.setState({ CAMPAÑA });
   setCoordenadas = COORDENADASGPS => this.setState({ COORDENADASGPS });
   setCantidad = cantidad => this.setState({ cantidad });
-  setInsumo = insumo => this.setState({ insumo });
-  setInsumos = () => {
-    //Agrega el insumo y la cantidad seleccionada en la lista INSUMOS
-    const { insumo, cantidad } = this.state;
-    if (insumo !== "" || parseInt(cantidad) > 0) {
-      let nuevoInsumo = {
-        insumoID: insumo,
-        cantidad: parseInt(cantidad)
-      };
-      this.setState(state => {
-        return {
-          INSUMOSGASTADOS: state.INSUMOSGASTADOS.concat(nuevoInsumo),
-          cantidad: "",
-          insumo: ""
-        };
-      });
-    } else {
-      alert("Porfavor llene los campos correctamente");
-    }
-  };
+
   setFechaVisita = FECHAVISITA => this.setState({ FECHAVISITA });
 
   setFechaProximaVisita = FECHAPROXIMAVISITA =>
@@ -62,7 +41,7 @@ export class FormRealizarVisita extends Component {
       if (camera) {
         let imagen = await camera.takePictureAsync({
           base64: true,
-          quality: 0.5
+          quality: 0.3
         });
         this.setImagen(imagen.base64);
       }
@@ -75,6 +54,7 @@ export class FormRealizarVisita extends Component {
       FECHAPROXIMAVISITA: new Date(),
       COORDENADASGPS: [],
       IMAGENES: [],
+      CAMPAÑA: "",
       errorMessage: "",
       status: "",
       mostrarCamara: false,
@@ -87,9 +67,8 @@ export class FormRealizarVisita extends Component {
     setLogroVisita: this.setLogroVisita,
     setMostrarCamara: this.setMostrarCamara,
     setCantidad: this.setCantidad,
-    setInsumo: this.setInsumo,
-    setInsumos: this.setInsumos,
     setCoordenadas: this.setCoordenadas,
+    setCampaña: this.setCampaña,
     snap: this.snap
   });
   render() {

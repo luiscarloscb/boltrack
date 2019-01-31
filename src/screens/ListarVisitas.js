@@ -12,6 +12,7 @@ export class ListarVisitas extends Component {
   };
   render() {
     const { DATA, TOKEN } = this.props.navigation.state.params;
+    console.log(TOKEN);
     return (
       <Lista
         estado="COMPLETADA"

@@ -1,9 +1,9 @@
 {
   "devToolsPort": 19002,
-  "expoServerPort": 19000,
+  "expoServerPort": null,
   "packagerPort": 19001,
-  "packagerPid": 3410,
+  "packagerPid": 30199,
   "expoServerNgrokUrl": "https://n9-34g.expoapps24.boltrack.exp.direct",
   "packagerNgrokUrl": "https://packager.n9-34g.expoapps24.boltrack.exp.direct",
-  "ngrokPid": 3455
+  "ngrokPid": 30045
 }

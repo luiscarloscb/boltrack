@@ -6,11 +6,13 @@ import {
   Card,
   CardItem,
   Body,
-  Text
+  Text,
+  Button
 } from "native-base";
 import { SearchBar } from "../components/SearchBar";
 import escapeRegExp from "escape-string-regexp";
 import sortBy from "sort-by";
+import { getClientes } from "../utils/boltrackAPI";
 const formatearClienteInfo = CLIENTE => {
   const {
     clienteID,
@@ -28,8 +30,18 @@ const formatearClienteInfo = CLIENTE => {
 
 export class InfoClientes extends Component {
   state = {
-    query: ""
+    query: "",
+    nuevosClientes: []
   };
+  actualizarNuevosClientes = async () => {
+    const { CLIENTES } = this.props.navigation.state.params.DATA;
+    let clientes = await getClientes();
+    this.setState({ nuevosClientes: [...CLIENTES, ...clientes] });
+  };
+  componentDidMount() {
+    const { CLIENTES } = this.props.navigation.state.params.DATA;
+    this.setState({ nuevosClientes: [...CLIENTES] });
+  }
   filterArrayByQuery = () => {
     const { query } = this.state;
     const { CLIENTES } = this.props.navigation.state.params.DATA;
@@ -54,8 +66,11 @@ export class InfoClientes extends Component {
           onChangeText={this.setQuery}
           styles={{ marginTop: 10, height: 40 }}
         />
+        {/* <Button full transparent onPress={this.actualizarNuevosClientes}>
+          <Text>Actualizar Clientes</Text>
+        </Button> */}
         <List
-          dataArray={clientes}
+          dataArray={this.state.nuevosClientes}
           renderRow={cliente => (
             <ListItem style={{ flex: 1 }}>
               <Card style={{ flex: 1 }}>

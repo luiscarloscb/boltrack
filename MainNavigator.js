@@ -11,7 +11,8 @@ import {
   RegistrarCliente,
   CrearVisitaNoProgramada,
   UserInfo,
-  CrearOrdenPedido
+  CrearOrdenPedido,
+  ListaOrdenes
 } from "./src/screens";
 
 const MainNavigator = createStackNavigator({
@@ -75,6 +76,12 @@ const MainNavigator = createStackNavigator({
     screen: ListarVisitas,
     navigationOptions: {
       headerTitle: "LISTA DE VISITAS REALIZADAS"
+    }
+  },
+  ListaOrdenes: {
+    screen: ListaOrdenes,
+    navigationOptions: {
+      headerTitle: "LISTA DE ORDENES"
     }
   },
   RegistrarCliente: {

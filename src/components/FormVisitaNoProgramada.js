@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from "react";
 import {
-  Form,
   Card,
   Item,
   DatePicker,
@@ -8,28 +7,32 @@ import {
   Text,
   Label,
   Input,
-  Button,
-  Picker
+  Button
 } from "native-base";
 import { FormRealizarVisita } from "./FormRealizarVisita";
 import { guardarVisitaRealizada } from "../utils/localStorageAPI";
-import { uuidv4 } from "../utils/helpers";
-import { InsumosPicker } from "./InsumosPicker";
-import { ListaInsumos } from "./ListaInsumos";
+import { uuidv4, encontrarSucursal } from "../utils/helpers";
 import { GPSInput } from "./GPSInput";
+
 export class FormVisitaNoProgramada extends Component {
   state = {
     IDCLIENTE: -1,
     IDSUCURSAL: -1,
+    IDCAMPANA: -1,
     sucursales: [],
-    query: ""
+    query: "",
+    habilitarGPS: true
   };
+  onToggleGPS = () =>
+    this.setState(state => ({ habilitarGPS: !state.habilitarGPS }));
   setQuery = query => this.setState({ query });
   resetQuery = () => this.setState({ query: "" });
+
+  setCampana = IDCAMPANA => this.setState({ IDCAMPANA });
   setCliente = IDCLIENTE =>
     this.setState(() => ({
       IDCLIENTE,
-      sucursales: this.encontrarSucursal(IDCLIENTE)
+      sucursales: encontrarSucursal(IDCLIENTE, this.props.CLIENTES)
     }));
 
   setSucursal = IDSUCURSAL => {
@@ -37,26 +40,7 @@ export class FormVisitaNoProgramada extends Component {
       IDSUCURSAL
     });
   };
-  renderInsumosItem = () => {
-    const { INSUMOS } = this.props;
-    return INSUMOS.length > 0 ? (
-      INSUMOS.map(item => (
-        <Picker.Item
-          key={item["insumoID"]}
-          label={item["insumoNombre"]}
-          value={item["insumoID"]}
-        />
-      ))
-    ) : (
-      <Picker.Item label="NO TIENE ASSIGNADO NINGUN ITEM" value={""} />
-    );
-  };
-  encontrarSucursal = IDCLIENTE => {
-    // Encuentra las sucursales disponibles por cliente seleccionado
-    const { CLIENTES } = this.props;
-    const cliente = CLIENTES.find(cliente => cliente.clienteID == IDCLIENTE);
-    return cliente ? cliente.sucursales : [];
-  };
+
   guardarVisita = async state => {
     const {
       errorMessage,
@@ -67,19 +51,38 @@ export class FormVisitaNoProgramada extends Component {
       cantidad,
       ...rest
     } = state;
-    const { IDCLIENTE, IDSUCURSAL } = this.state;
-    await guardarVisitaRealizada(
-      { ...rest, ...this.state, IDCLIENTE, IDSUCURSAL, IDVISITA: uuidv4() },
-      () => this.props.goBack()
-    );
+    const { IDCLIENTE, IDSUCURSAL, habilitarGPS, IDCAMPANA } = this.state;
+    if (habilitarGPS && state.COORDENADASGPS[0] && state.COORDENADASGPS[1]) {
+      if (IDCLIENTE !== -1 && IDSUCURSAL !== -1 && IDCAMPANA !== -1) {
+        await guardarVisitaRealizada(
+          { ...rest, IDCLIENTE, IDSUCURSAL, IDCAMPANA, IDVISITA: uuidv4() },
+          () => this.props.goBack()
+        );
+      } else {
+        alert("Porfavor seleccione Cliente y Sucursal");
+      }
+    } else {
+      if (!this.state.habilitarGPS) {
+        if (IDCLIENTE !== -1 && IDSUCURSAL !== -1 && IDCAMPANA !== -1) {
+          await guardarVisitaRealizada(
+            { ...rest, IDCLIENTE, IDSUCURSAL, IDCAMPANA, IDVISITA: uuidv4() },
+            () => this.props.navigation.goBack()
+          );
+        } else {
+          alert("Porfavor seleccione Cliente y Sucursal");
+        }
+      } else {
+        alert("No se pudo obtener cordenadas GPS");
+      }
+    }
   };
   resetState = () => this.setState({ IDCLIENTE: -1, IDSUCURSAL: -1 });
   getSetters = () => ({
     setCliente: this.setCliente,
-    setSucursal: this.setSucursal
+    setSucursal: this.setSucursal,
+    setCampana: this.setCampana
   });
   render() {
-    const { INSUMOS } = this.props;
     return (
       <Fragment>
         {this.props.children(this.state, this.getSetters(), this.resetState)}
@@ -130,23 +133,12 @@ export class FormVisitaNoProgramada extends Component {
                   {state.FECHAPROXIMAVISITA.toString().substr(4, 12)}
                 </Text>
               </Item>
-              <Item>
-                <InsumosPicker
-                  state={{ ...state, query: this.state.query }}
-                  setters={{
-                    ...setters,
-                    resetQuery: this.resetQuery,
-                    setQuery: this.setQuery
-                  }}
-                  insumos={INSUMOS}
-                />
-              </Item>
-              <Item>
-                <ListaInsumos data={state.INSUMOSGASTADOS} insumos={INSUMOS} />
-              </Item>
+
               <GPSInput
                 setCoordenadas={setters.setCoordenadas}
                 value={state.COORDENADASGPS}
+                isGpsEnable={this.state.habilitarGPS}
+                onEnableGPS={this.onToggleGPS}
               />
               <Button
                 style={{ margin: 10 }}

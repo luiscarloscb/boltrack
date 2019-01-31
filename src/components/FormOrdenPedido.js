@@ -1,90 +1,115 @@
-// ***Orden de Pedido
-// * Cliente
-// * Sucursal
-// * Fecha generacion de Orden (fecha actual por defecto pero que deje escoger)
-// * Forma de pago (Efectivo/Credito/Cuotas (Nro. de Cuotas))
-// * Articulos o Servicios ( [nombre, cantidad, precioBase/precio1/precio2] )
-// * Fecha comprometida de entrega
 import React, { Component } from "react";
 import { Form } from "native-base";
+import { guardarOrden } from "../utils/localStorageAPI";
+import { encontrarSucursal } from "../utils/helpers";
 
 export class FormOrdenPedido extends Component {
   state = {
     IDCLIENTE: -1,
     IDSUCURSAL: -1,
     FECHAORDEN: new Date(),
-    FORMAPAGO: "",
+    IDFORMAPAGO: -1,
     ARTICULOS: [],
     ARTICULO: "",
     CANTIDAD: "",
+    CUOTAS: "",
     PRECIOBASE: "",
-    PRECIOSECUNDARIO: "",
-    PRECIOSECUNDARIOOPT: "",
+    CORREOOPT: "",
+    IDCAMPANA: -1,
     FECHAENTREGA: new Date(),
     sucursales: []
   };
+  //BACK TO INIT STATE
+  resetOrdenState = () =>
+    this.setState({
+      IDCLIENTE: -1,
+      IDSUCURSAL: -1,
+      FECHAORDEN: new Date(),
+      IDFORMAPAGO: -1,
+      ARTICULOS: [],
+      ARTICULO: "",
+      CANTIDAD: "",
+      CUOTAS: "",
+      PRECIOBASE: "",
+      CORREOOPT: "",
+      IDCAMPANA: -1,
+      FECHAENTREGA: new Date(),
+      sucursales: []
+    });
 
+  // SETTINGS FOR INDIVIDUAL PIECES OF STATE.
+  setCuotas = CUOTAS => this.setState({ CUOTAS });
+  setCampana = IDCAMPANA => this.setState({ IDCAMPANA });
+  setCorreoOpt = CORREOOPT => this.setState({ CORREOOPT });
+  setFechaEntrega = FECHAENTREGA => this.setState({ FECHAENTREGA });
+  setFechaOrden = FECHAORDEN => this.setState({ FECHAORDEN });
+  setFormaPago = IDFORMAPAGO => this.setState({ IDFORMAPAGO });
+  setArticulo = ARTICULO =>
+    this.setState({
+      ARTICULO,
+      PRECIOBASE: this.props.INSUMOS.find(
+        insumo => insumo.insumoID === ARTICULO
+      ).precioBase
+    });
+  setCantidad = CANTIDAD => this.setState({ CANTIDAD });
+  setPrecioBase = PRECIOBASE => this.setState({ PRECIOBASE });
   setCliente = IDCLIENTE =>
     this.setState(() => ({
       IDCLIENTE,
-      sucursales: this.encontrarSucursal(IDCLIENTE)
+      sucursales: encontrarSucursal(IDCLIENTE, this.props.CLIENTES)
     }));
-
   setSucursal = IDSUCURSAL =>
     this.setState({
       IDSUCURSAL
     });
-  setFechaOrden = FECHAORDEN => this.setState({ FECHAORDEN });
-  setFormaPago = FORMAPAGO => this.setState({ FORMAPAGO });
-  setArticulo = ARTICULO => this.setState({ ARTICULO });
-  setCantidad = CANTIDAD => this.setState({ CANTIDAD });
-  setPrecioBase = PRECIOBASE => this.setState({ PRECIOBASE });
-  setPrecioSecundario = PRECIOSECUNDARIO => this.setState({ PRECIOSECUNDARIO });
-  setPrecioSecundarioOpt = PRECIOSECUNDARIOOPT =>
-    this.setState({ PRECIOSECUNDARIOOPT });
   setArticulos = () => {
-    //Agrega el insumo y la cantidad seleccionada en la lista INSUMOS
-    const {
-      ARTICULO,
-      CANTIDAD,
-      PRECIOBASE,
-      PRECIOSECUNDARIO,
-      PRECIOSECUNDARIOOPT
-    } = this.state;
+    const { ARTICULO, CANTIDAD, PRECIOBASE } = this.state;
     if (
       ARTICULO !== "" &&
       parseInt(CANTIDAD) > 0 &&
-      parseInt(PRECIOBASE) > 0
-      // && parseInt(PRECIOSECUNDARIO) > 0 &&
-      // parseInt(PRECIOSECUNDARIOOPT) > 0
+      parseFloat(PRECIOBASE) > 0
     ) {
       let nuevoArticulo = {
+        articuloNombre: this.props.INSUMOS.find(
+          insumo => insumo.insumoID === ARTICULO
+        ).insumoNombre,
         articuloID: ARTICULO,
         cantidad: parseInt(CANTIDAD),
-        precioBase: parseInt(PRECIOBASE),
-        precioSecundario: parseInt(PRECIOSECUNDARIO),
-        precioSecundarioOpt: parseInt(PRECIOSECUNDARIOOPT)
+        precioBase: parseFloat(PRECIOBASE)
       };
       this.setState(state => {
         return {
           ARTICULOS: state.ARTICULOS.concat(nuevoArticulo),
           ARTICULO: "",
           CANTIDAD: "",
-          PRECIOBASE: "",
-          PRECIOSECUNDARIO: "",
-          PRECIOSECUNDARIOOPT: ""
+          PRECIOBASE: ""
         };
+      });
+    } else {
+      alert(
+        "PARA AGREGAR UN ARTICULO PORFAVOR LLENE LOS CAMPOS: ARTICULO, CANTIDAD, PRECIO"
+      );
+    }
+  };
+  eliminarArticulo = idArticulo =>
+    this.setState(state => ({
+      ARTICULOS: state.ARTICULOS.filter(
+        articulo => articulo.articuloID !== idArticulo
+      )
+    }));
+
+  onSave = () => {
+    const { ARTICULO, CANTIDAD, PRECIOBASE, sucursales, ...rest } = this.state;
+    //REQUIRED FIELDS TO SAVE AN ORDER
+    if (rest.IDSUCURSAL && rest.FECHAORDEN && rest.IDCAMPANA) {
+      rest.CUOTAS = Number(rest.CUOTAS);
+      guardarOrden({ ...rest }, () => {
+        this.resetOrdenState();
+        alert("Orden Guardada Localmente");
       });
     } else {
       alert("Porfavor llene los campos correctamente");
     }
-  };
-  setFechaEntrega = FECHAENTREGA => this.setState({ FECHAENTREGA });
-  encontrarSucursal = IDCLIENTE => {
-    // Encuentra las sucursales disponibles por cliente seleccionado
-    const { clientes } = this.props;
-    const cliente = clientes.find(cliente => cliente.clienteID == IDCLIENTE);
-    return cliente ? cliente.sucursales : [];
   };
   getSetters = () => ({
     setCliente: this.setCliente,
@@ -95,9 +120,12 @@ export class FormOrdenPedido extends Component {
     setArticulo: this.setArticulo,
     setCantidad: this.setCantidad,
     setPrecioBase: this.setPrecioBase,
-    setPrecioSecundario: this.setPrecioSecundario,
-    setPrecioSecundarioOpt: this.setPrecioSecundarioOpt,
-    setArticulos: this.setArticulos
+    setArticulos: this.setArticulos,
+    setCorreoOpt: this.setCorreoOpt,
+    setCampana: this.setCampana,
+    setCuotas: this.setCuotas,
+    eliminarArticulo: this.eliminarArticulo,
+    onSave: this.onSave
   });
   render() {
     return <Form>{this.props.children(this.state, this.getSetters())}</Form>;
