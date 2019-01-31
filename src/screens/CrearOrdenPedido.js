@@ -95,10 +95,6 @@ export class CrearOrdenPedido extends Component {
                       placeHolderTextStyle={{ color: "#d3d3d3" }}
                       onDateChange={setters.setFechaOrden}
                     />
-                    <Text>
-                      Fecha orden:
-                      {state.FECHAORDEN.toString().substr(4, 12)}
-                    </Text>
                   </Item>
                   <Item>
                     <DatePicker
@@ -112,10 +108,6 @@ export class CrearOrdenPedido extends Component {
                       placeHolderTextStyle={{ color: "#d3d3d3" }}
                       onDateChange={setters.setFechaEntrega}
                     />
-                    <Text>
-                      Fecha Entrega:
-                      {state.FECHAENTREGA.toString().substr(4, 12)}
-                    </Text>
                   </Item>
                   <Item>
                     <Catalogo

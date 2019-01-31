@@ -27,7 +27,8 @@ export class FormRealizarVisita extends Component {
   setFechaProximaVisita = FECHAPROXIMAVISITA =>
     this.setState({ FECHAPROXIMAVISITA });
 
-  setLogroVisita = LOGROSVISITA => this.setState({ LOGROSVISITA });
+  setLogroVisita = LOGROSVISITA =>
+    this.setState({ LOGROSVISITA: LOGROSVISITA.toUpperCase() });
   setMostrarCamara = () => this.setState({ mostrarCamara: true });
   setImagen = IMAGEN =>
     this.setState(state => ({

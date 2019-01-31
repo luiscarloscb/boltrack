@@ -68,9 +68,6 @@ export class CrearPlan extends Component {
                       placeHolderTextStyle={{ color: "#d3d3d3" }}
                       onDateChange={setters.setFechaTarea}
                     />
-                    <Text>
-                      Fecha Tarea: {state.FECHATAREA.toString().substr(4, 12)}
-                    </Text>
                   </Item>
                   <Item>
                     <DatePicker
@@ -84,10 +81,6 @@ export class CrearPlan extends Component {
                       placeHolderTextStyle={{ color: "#d3d3d3" }}
                       onDateChange={setters.setFechaPlanificada}
                     />
-                    <Text>
-                      Fecha Planificada:{" "}
-                      {state.FECHAPLANIFICADA.toString().substr(4, 12)}
-                    </Text>
                   </Item>
                   <Item>
                     <Catalogo

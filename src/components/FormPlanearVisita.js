@@ -41,9 +41,10 @@ export class FormPlanearVisita extends Component {
   };
   setTemaVisita = IDTEMAVISITA => this.setState({ IDTEMAVISITA });
   setCantidad = cantidad => this.setState({ cantidad });
-  setContacto = CONTACTO => this.setState({ CONTACTO });
-  setDesarrolloTarea = DESARROLLOTAREA => this.setState({ DESARROLLOTAREA });
-  setObjetivo = OBJETIVO => this.setState({ OBJETIVO });
+  setContacto = CONTACTO => this.setState({ CONTACTO: CONTACTO.toUpperCase() });
+  setDesarrolloTarea = DESARROLLOTAREA =>
+    this.setState({ DESARROLLOTAREA: DESARROLLOTAREA.toUpperCase() });
+  setObjetivo = OBJETIVO => this.setState({ OBJETIVO: OBJETIVO.toUpperCase() });
 
   resetState = () =>
     //Vuelve el state a su estado original
@@ -54,7 +55,6 @@ export class FormPlanearVisita extends Component {
       IDCLIENTE: -1,
       IDSUCURSAL: -1,
       IDTEMAVISITA: -1,
-      insumo: -1,
       cantidad: "",
       DESARROLLOTAREA: "",
       OBJETIVO: "",

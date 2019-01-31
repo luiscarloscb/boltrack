@@ -19,18 +19,21 @@ export class FormRegistrarCliente extends Component {
   };
   setEmpleado = EMPLEADO => this.setState({ EMPLEADO });
   setCorreo = CORREO => this.setState({ CORREO });
-  setRazonSocial = RAZONSOCIAL => this.setState({ RAZONSOCIAL });
-  setRubro = RUBROID => this.setState({ RUBROID });
+  setRazonSocial = RAZONSOCIAL =>
+    this.setState({ RAZONSOCIAL: RAZONSOCIAL.toUpperCase() });
+  setRubro = RUBROID => this.setState({ RUBROID: RUBROID.toUpperCase() });
   setActividadPrincipal = ACTIVIDADPRINCIPAL =>
-    this.setState({ ACTIVIDADPRINCIPAL });
+    this.setState({ ACTIVIDADPRINCIPAL: ACTIVIDADPRINCIPAL.toUpperCase() });
   setActividadSecundaria = ACTIVIDADSECUNDARIA =>
-    this.setState({ ACTIVIDADSECUNDARIA });
+    this.setState({ ACTIVIDADPRINCIPAL: ACTIVIDADSECUNDARIA.toUpperCase() });
   setActividadSecundariaOpt = ACTICVIDADSECUNDARIAOPT =>
-    this.setState({ ACTICVIDADSECUNDARIAOPT });
+    this.setState({
+      ACTIVIDADPRINCIPAL: ACTICVIDADSECUNDARIAOPT.toUpperCase()
+    });
   setTipoPersona = TIPOPERSONA => this.setState({ TIPOPERSONA });
   setNIT = NIT => this.setState({ NIT });
   setRepresentanteLegal = REPRESENTANTELEGAL =>
-    this.setState({ REPRESENTANTELEGAL });
+    this.setState({ REPRESENTANTELEGAL: REPRESENTANTELEGAL.toUpperCase() });
   toggleIsChecked = () =>
     this.setState(state => ({ isChecked: !state.isChecked }));
   setLimiteCredito = LIMITECREDITO => this.setState({ LIMITECREDITO });

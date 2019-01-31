@@ -95,10 +95,6 @@ export class CrearVisita extends Component {
                         placeHolderTextStyle={{ color: "#d3d3d3" }}
                         onDateChange={setters.setFechaVisita}
                       />
-                      <Text>
-                        Fecha Tarea:
-                        {state.FECHAVISITA.toString().substr(4, 12)}
-                      </Text>
                     </Item>
                     <Item>
                       <Item stackedLabel>
@@ -123,10 +119,6 @@ export class CrearVisita extends Component {
                         placeHolderTextStyle={{ color: "#d3d3d3" }}
                         onDateChange={setters.setFechaProximaVisita}
                       />
-                      <Text>
-                        Fecha Proxima Visita:
-                        {state.FECHAPROXIMAVISITA.toString().substr(4, 12)}
-                      </Text>
                     </Item>
 
                     <GPSInput

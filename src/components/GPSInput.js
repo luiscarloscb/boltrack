@@ -39,7 +39,7 @@ export class GPSInput extends Component {
             <Input value={JSON.stringify(this.props.value)} />
           </Item>
         ) : (
-          <Text>"No GPS Habilitado"</Text>
+          <Text>GPS deshabilitado</Text>
         )}
       </Fragment>
     );

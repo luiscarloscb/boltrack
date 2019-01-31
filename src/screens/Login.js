@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { LocalAuthentication } from "expo";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Form, Item, Input, Text, Container, Content } from "native-base";
 import { Button } from "../components/Button";
 import { containersStyles, inputStyles, fontStyles } from "../styles";
@@ -7,6 +8,7 @@ import { login } from "../utils/boltrackAPI";
 import { guardarDato, obtenerDato } from "../utils/localStorageAPI";
 import { StackActions, NavigationActions } from "react-navigation";
 import { PinAuth } from "../components/PinAuth";
+import { Platform, View } from "react-native";
 export class Login extends Component {
   state = {
     username: "",
@@ -111,7 +113,11 @@ export class Login extends Component {
       <PinAuth onComplete={this.setPin} info={this.state.pinText} />
     ) : (
       <Container style={authBackground}>
-        <Content
+        <KeyboardAwareScrollView
+          enableOnAndroid
+          enableAutomaticScroll
+          keyboardOpeningTime={0}
+          extraHeight={Platform.select({ android: 200 })}
           contentContainerStyle={{
             flex: 1,
             justifyContent: "center",
@@ -142,8 +148,17 @@ export class Login extends Component {
               Iniciar sesion
             </Button>
           </Form>
-        </Content>
+        </KeyboardAwareScrollView>
       </Container>
     );
   }
 }
+
+// <Content
+//           contentContainerStyle={{
+//             flex: 1,
+//             justifyContent: "center",
+//             alignItems: "center"
+//           }}
+//         ></Content>
+//         </Content>

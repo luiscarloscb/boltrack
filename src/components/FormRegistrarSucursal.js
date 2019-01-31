@@ -50,9 +50,11 @@ export class FormRegistrarSucursal extends Component {
   setProveedorPrincipal = PROVEEDORPRINCIPAL =>
     this.setState({ PROVEEDORPRINCIPAL });
   setProveedorSecundario = PROVEEDORSECUNDARIO =>
-    this.setState({ PROVEEDORSECUNDARIO });
+    this.setState({ PROVEERDORSECUNDARIO: PROVEEDORSECUNDARIO.toUpperCase() });
   setProveedorSecundarioOpt = PROVEEDORSECUNDARIOOPT =>
-    this.setState({ PROVEEDORSECUNDARIOOPT });
+    this.setState({
+      PROVEERDORSECUNDARIO: PROVEEDORSECUNDARIOOPT.toUpperCase()
+    });
 
   setMostrarCamara = () => this.setState({ mostrarCamara: true });
   componentWillUnmount() {
